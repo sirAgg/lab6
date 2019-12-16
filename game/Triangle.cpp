@@ -9,9 +9,6 @@ Triangle::Triangle(Point2D pos, Color color, int base, int height)
 
 void Triangle::render(SDL_Renderer* renderer)
 {
-    printf("TRIANGLE:\n\tpos: %s\n\tcolor: %08X\n\tbase: %d\n\theight: %d\n",
-         position.to_string().c_str(), color.toInt(), base, height );
-    
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 
     int hb = base/2;

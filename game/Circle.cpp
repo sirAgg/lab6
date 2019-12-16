@@ -11,10 +11,6 @@ Circle::Circle(Point2D pos, Color color, int radius)
 
 void Circle::render(SDL_Renderer* renderer)
 {
-    printf("CIRCLE:\n\tpos: %s\n\tcolor: %08X\n\tradius: %d\n",
-         position.to_string().c_str(), color.toInt(), radius);
-    
-    
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a );
 
     float angle1 = 0.0f;
