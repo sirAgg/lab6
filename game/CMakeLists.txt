@@ -1,5 +1,5 @@
 cmake_minimum_required( VERSION 3.10 )
-link_directories(BEFORE "deps" ".")
+link_directories(BEFORE "deps/SDL2" ".")
 
 #SET(CMAKE_CXX_FLAGS "-O3")
 
@@ -23,12 +23,15 @@ add_executable(game
     Triangle.cpp
     Circle.cpp
 )
+
+
+
 if(WIN32)
-    include_directories(BEFORE "deps" "deps/winin/include/")
+    include_directories(BEFORE "deps/SDL2" "deps/SDL2/win_include/")
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS YES)
-    configure_file("deps/SDL2.dll" "${CMAKE_BINARY_DIR}/SDL2.dll" COPYONLY)
+    configure_file("deps/SDL2/SDL2.dll" "${CMAKE_BINARY_DIR}/SDL2.dll" COPYONLY)
     target_link_libraries(game ${CMAKE_SOURCE_DIR}/deps/SDL2.lib ${CMAKE_SOURCE_DIR}/deps/SDL2main.lib )
 else()
-    include_directories("deps" "deps/include")
-    target_link_libraries(game dl pthread sndio ${CMAKE_SOURCE_DIR}/deps/libSDL2-2.0.so)
+    include_directories("deps/SDL2" "deps/SDL2/unix_include")
+    target_link_libraries(game dl pthread sndio ${CMAKE_SOURCE_DIR}/deps/SDL2/libSDL2-2.0.so)
 endif()
