@@ -4,6 +4,8 @@
 #include <cstdlib>
 #include <time.h>
 #include "SDL.h"
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 #include "Point2D.h"
 #include "Shape.h"
@@ -38,6 +40,38 @@ Circle* create_random_circle()
             rand()%window_height);
 }
 
+glm::vec3 cube[] 
+{
+    {0.0f,0.0f,0.0f},
+    {1.0f,0.0f,0.0f},
+    {0.0f,0.0f,0.0f},
+    {0.0f,1.0f,0.0f},
+    {0.0f,0.0f,0.0f},
+    {0.0f,0.0f,1.0f},
+    
+    {1.0f,0.0f,0.0f},
+    {1.0f,1.0f,0.0f},
+    {1.0f,0.0f,0.0f},
+    {1.0f,0.0f,1.0f},
+    
+    {0.0f,1.0f,0.0f},
+    {1.0f,1.0f,0.0f},
+    {0.0f,1.0f,0.0f},
+    {0.0f,1.0f,1.0f},
+    
+    {0.0f,0.0f,1.0f},
+    {1.0f,0.0f,1.0f},
+    {0.0f,0.0f,1.0f},
+    {0.0f,1.0f,1.0f},
+    
+    {1.0f,1.0f,1.0f},
+    {0.0f,1.0f,1.0f},
+    {1.0f,1.0f,1.0f},
+    {1.0f,0.0f,1.0f},
+    {1.0f,1.0f,1.0f},
+    {1.0f,1.0f,0.0f}
+};
+
 int main(int argc, char** argv)
 {
     // initilize SDL
@@ -57,6 +91,10 @@ int main(int argc, char** argv)
     std::vector<Shape*> shapes;
 
     bool run = true;
+
+
+    // create projection matrix
+    glm::mat4 proj_mat = glm::perspective(glm::radians(45.0f), (float)window_height/(float)window_width, 0.1f, 100.0f);
 
     while (run)
     {
@@ -100,8 +138,24 @@ int main(int argc, char** argv)
         for (auto shape : shapes)
             shape->render(renderer);
 
-        SDL_RenderPresent(renderer);
+
+
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        { // render wireframe cube
+
+            for (int i = 0; i < 28; i+=2)
+            {
+                glm::vec4 pos1 = proj_mat * glm::vec4( cube[i], 1.0f );
+                glm::vec4 pos2 = proj_mat * glm::vec4( cube[i+1], 1.0f );
+                SDL_Point p1 = {(int)pos1.x,(int)pos1.y};
+                SDL_Point p2 = {(int)pos2.x,(int)pos2.y};
+
+                SDL_RenderDrawLine( renderer, p1.x*30, p1.y*30, p2.x*30, p2.y*30 );
+            }
+        
+        }
 		
+        SDL_RenderPresent(renderer);
 
 		if(start_time < 16)
 			SDL_Delay(16-start_time);

@@ -1,0 +1,3 @@
+[submodule "game/deps/glm"]
+	path = game/deps/glm
+	url = https://github.com/g-truc/glm.git
