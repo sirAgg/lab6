@@ -72,6 +72,13 @@ glm::vec3 cube[]
     {1.0f,1.0f,0.0f}
 };
 
+void print_two_vec3(glm::vec3& v1, glm::vec3& v2)
+{
+    printf("(%f,%f,%f) -> (%f,%f,%f)\n", 
+            v1.x,v1.y,v1.z,
+            v2.x,v2.y,v2.z);
+}
+
 int main(int argc, char** argv)
 {
     // initilize SDL
@@ -94,7 +101,21 @@ int main(int argc, char** argv)
 
 
     // create projection matrix
-    glm::mat4 proj_mat = glm::perspective(glm::radians(45.0f), (float)window_height/(float)window_width, 0.1f, 100.0f);
+    glm::mat4 post_trans = glm::mat4(1.0f);
+    //post_trans = glm::translate(post_trans, glm::vec3(0.0f, (float)window_height, 0.0f)); // for inverting Y
+    post_trans = glm::scale(post_trans, glm::vec3((float)window_width/2.0f, (float)window_height/2.0f, 1.0f));
+    post_trans = glm::translate(post_trans, glm::vec3(1.0f, 1.0f, 0.0f));
+
+
+    glm::mat4 proj_mat = glm::perspective(glm::radians(45.0f), (float)window_width/(float)window_height, 0.1f, 100.0f);
+
+    glm::mat4 model_mat = glm::mat4(1.0f);
+    model_mat = glm::translate(model_mat, glm::vec3( 0.0f, 0.0f, 0.0f ));
+    model_mat = glm::scale(model_mat, glm::vec3( 0.3f ) );
+    //printf("[%f,%f,%f,%f]\n",proj_mat[0][0],proj_mat[0][1],proj_mat[0][2],proj_mat[0][3]);
+    //printf("[%f,%f,%f,%f]\n",proj_mat[1][0],proj_mat[1][1],proj_mat[1][2],proj_mat[1][3]);
+    //printf("[%f,%f,%f,%f]\n",proj_mat[2][0],proj_mat[2][1],proj_mat[2][2],proj_mat[2][3]);
+    //printf("[%f,%f,%f,%f]\n",proj_mat[3][0],proj_mat[3][1],proj_mat[3][2],proj_mat[3][3]);
 
     while (run)
     {
@@ -132,27 +153,39 @@ int main(int argc, char** argv)
         
         //printf("Shapes: %d\n", (int)rectangles.size() + (int)triangles.size() + (int)circles.size());
 
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
         for (auto shape : shapes)
             shape->render(renderer);
 
 
-
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         { // render wireframe cube
 
-            for (int i = 0; i < 28; i+=2)
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+            glm::vec4 pos1 = post_trans * proj_mat * glm::vec4( 0.0f,0.0f,1.0f,1.0f );
+            glm::vec4 pos2 = post_trans * proj_mat * glm::vec4( 1.0f,1.0f,1.0f, 1.0f );
+            SDL_Point p1 = {(int)pos1.x,(int)pos1.y};
+            SDL_Point p2 = {(int)pos2.x,(int)pos2.y};
+            printf("(%f,%f) -> (%f,%f)\n", pos1.x, pos1.y, pos2.x, pos2.y );
+            SDL_RenderDrawLine( renderer, p1.x, p1.y, p2.x, p2.y );
+
+            //printf("-----\n");
+            /*
+            for (int i = 0; i < 24; i+=2)
             {
-                glm::vec4 pos1 = proj_mat * glm::vec4( cube[i], 1.0f );
-                glm::vec4 pos2 = proj_mat * glm::vec4( cube[i+1], 1.0f );
+                glm::vec4 pos1 = post_trans * proj_mat * model_mat * glm::vec4( cube[i], 1.0f );
+                glm::vec4 pos2 = post_trans * proj_mat * model_mat * glm::vec4( cube[i+1], 1.0f );
                 SDL_Point p1 = {(int)pos1.x,(int)pos1.y};
                 SDL_Point p2 = {(int)pos2.x,(int)pos2.y};
 
-                SDL_RenderDrawLine( renderer, p1.x*30, p1.y*30, p2.x*30, p2.y*30 );
+                //print_two_vec3(cube[i], cube[i+1]);
+                //printf("(%f,%f) -> (%f,%f)\n", pos1.x, pos1.y, pos2.x, pos2.y );
+
+                SDL_RenderDrawLine( renderer, p1.x, p1.y, p2.x, p2.y );
             }
-        
+            */
         }
 		
         SDL_RenderPresent(renderer);
