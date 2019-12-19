@@ -13,8 +13,8 @@
 #include "Triangle.h"
 #include "Circle.h"
 
-const int window_width  = 600;
-const int window_height = 400;
+const int window_width  = 1000;
+const int window_height = 800;
 
 Rectangle* create_random_rectange()
 {
@@ -103,11 +103,15 @@ int main(int argc, char** argv)
     // create projection matrix
     glm::mat4 post_trans = glm::mat4(1.0f);
     //post_trans = glm::translate(post_trans, glm::vec3(0.0f, (float)window_height, 0.0f)); // for inverting Y
+    post_trans = glm::translate(post_trans, -glm::vec3(500.0f, 400.0f, 0.0f));
     post_trans = glm::scale(post_trans, glm::vec3((float)window_width/2.0f, (float)window_height/2.0f, 1.0f));
-    post_trans = glm::translate(post_trans, glm::vec3(1.0f, 1.0f, 0.0f));
+    //post_trans = glm::translate(post_trans, -glm::vec3(1.0f, 1.0f, 0.0f));
 
 
     glm::mat4 proj_mat = glm::perspective(glm::radians(45.0f), (float)window_width/(float)window_height, 0.1f, 100.0f);
+    
+    glm::mat4 view_mat = glm::mat4(1.0f);
+    view_mat = glm::translate(view_mat, glm::vec3( 0.0f, 0.0f, -0.5f ));
 
     glm::mat4 model_mat = glm::mat4(1.0f);
     model_mat = glm::translate(model_mat, glm::vec3( 0.0f, 0.0f, 0.0f ));
@@ -120,7 +124,6 @@ int main(int argc, char** argv)
     while (run)
     {
 		int start_time = SDL_GetTicks();
-
 
         // event handeling
         while(SDL_PollEvent(&event))
@@ -159,20 +162,22 @@ int main(int argc, char** argv)
         for (auto shape : shapes)
             shape->render(renderer);
 
-
         { // render wireframe cube
 
             SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
-            glm::vec4 pos1 = post_trans * proj_mat * glm::vec4( 0.0f,0.0f,1.0f,1.0f );
-            glm::vec4 pos2 = post_trans * proj_mat * glm::vec4( 1.0f,1.0f,1.0f, 1.0f );
+            glm::vec4 pos1 = proj_mat * view_mat * model_mat * glm::vec4( 0.0f,0.0f,0.0f,1.0f );
+            glm::vec4 pos2 = proj_mat * view_mat * model_mat * glm::vec4( 0.5f,0.5f,0.0f, 1.0f );
+            printf("(%f,%f,%f) -> (%f,%f,%f)\n", pos1.x, pos1.y, pos1.z, pos2.x, pos2.y, pos2.z );
+            pos1 = post_trans * pos1;
+            pos2 = post_trans * pos2;
+            printf("(%f,%f,%f) -> (%f,%f,%f)\n", pos1.x, pos1.y, pos1.z, pos2.x, pos2.y, pos2.z );
             SDL_Point p1 = {(int)pos1.x,(int)pos1.y};
             SDL_Point p2 = {(int)pos2.x,(int)pos2.y};
-            printf("(%f,%f) -> (%f,%f)\n", pos1.x, pos1.y, pos2.x, pos2.y );
-            SDL_RenderDrawLine( renderer, p1.x, p1.y, p2.x, p2.y );
+            //printf("(%d,%d) -> (%d,%d)\n", p1.x, p1.y, p2.x, p2.y );
+            //SDL_RenderDrawLine( renderer, p1.x, p1.y, p2.x, p2.y );
 
             //printf("-----\n");
-            /*
             for (int i = 0; i < 24; i+=2)
             {
                 glm::vec4 pos1 = post_trans * proj_mat * model_mat * glm::vec4( cube[i], 1.0f );
@@ -185,7 +190,6 @@ int main(int argc, char** argv)
 
                 SDL_RenderDrawLine( renderer, p1.x, p1.y, p2.x, p2.y );
             }
-            */
         }
 		
         SDL_RenderPresent(renderer);
