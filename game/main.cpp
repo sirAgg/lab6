@@ -98,29 +98,19 @@ int main(int argc, char** argv)
     std::vector<Shape*> shapes;
 
     bool run = true;
+    float rotation = 0;
 
+    // for mapping normal projection to screen-coordinates
+    glm::mat4 post_trans = glm::mat4(1.0f);
+    post_trans = glm::scale(post_trans, glm::vec3((float)window_width/2.0f, -(float)window_height/2.0f, 0.01f));
+    post_trans = glm::translate(post_trans, glm::vec3(1.0f, -1.0f, 0.0f));
 
     // create projection matrix
-    glm::mat4 post_trans = glm::mat4(1.0f);
-    //post_trans = glm::translate(post_trans, glm::vec3(0.0f, (float)window_height, 0.0f)); // for inverting Y
-    post_trans = glm::translate(post_trans, -glm::vec3(500.0f, 400.0f, 0.0f));
-    post_trans = glm::scale(post_trans, glm::vec3((float)window_width/2.0f, (float)window_height/2.0f, 1.0f));
-    //post_trans = glm::translate(post_trans, -glm::vec3(1.0f, 1.0f, 0.0f));
+    glm::mat4 proj_mat = glm::perspective(90.0f, (float)window_width/(float)window_height, 1.0f, 100.0f);
 
-
-    glm::mat4 proj_mat = glm::perspective(glm::radians(45.0f), (float)window_width/(float)window_height, 0.1f, 100.0f);
-    
     glm::mat4 view_mat = glm::mat4(1.0f);
-    view_mat = glm::translate(view_mat, glm::vec3( 0.0f, 0.0f, -0.5f ));
 
-    glm::mat4 model_mat = glm::mat4(1.0f);
-    model_mat = glm::translate(model_mat, glm::vec3( 0.0f, 0.0f, 0.0f ));
-    model_mat = glm::scale(model_mat, glm::vec3( 0.3f ) );
-    //printf("[%f,%f,%f,%f]\n",proj_mat[0][0],proj_mat[0][1],proj_mat[0][2],proj_mat[0][3]);
-    //printf("[%f,%f,%f,%f]\n",proj_mat[1][0],proj_mat[1][1],proj_mat[1][2],proj_mat[1][3]);
-    //printf("[%f,%f,%f,%f]\n",proj_mat[2][0],proj_mat[2][1],proj_mat[2][2],proj_mat[2][3]);
-    //printf("[%f,%f,%f,%f]\n",proj_mat[3][0],proj_mat[3][1],proj_mat[3][2],proj_mat[3][3]);
-
+    // main game loop
     while (run)
     {
 		int start_time = SDL_GetTicks();
@@ -163,25 +153,22 @@ int main(int argc, char** argv)
             shape->render(renderer);
 
         { // render wireframe cube
-
-            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-
-            glm::vec4 pos1 = proj_mat * view_mat * model_mat * glm::vec4( 0.0f,0.0f,0.0f,1.0f );
-            glm::vec4 pos2 = proj_mat * view_mat * model_mat * glm::vec4( 0.5f,0.5f,0.0f, 1.0f );
-            printf("(%f,%f,%f) -> (%f,%f,%f)\n", pos1.x, pos1.y, pos1.z, pos2.x, pos2.y, pos2.z );
-            pos1 = post_trans * pos1;
-            pos2 = post_trans * pos2;
-            printf("(%f,%f,%f) -> (%f,%f,%f)\n", pos1.x, pos1.y, pos1.z, pos2.x, pos2.y, pos2.z );
-            SDL_Point p1 = {(int)pos1.x,(int)pos1.y};
-            SDL_Point p2 = {(int)pos2.x,(int)pos2.y};
-            //printf("(%d,%d) -> (%d,%d)\n", p1.x, p1.y, p2.x, p2.y );
-            //SDL_RenderDrawLine( renderer, p1.x, p1.y, p2.x, p2.y );
+            glm::mat4 model_mat = glm::mat4(1.0f);
+            // model_mat = glm::rotate(model_mat, rotation, glm::vec3(1.0f, 0.5f, 0.7f));
+            // model_mat = glm::scale(model_mat, glm::vec3( 0.3f ) );
+            model_mat = glm::translate(model_mat, glm::vec3( -0.5f, -0.5f, -0.5f ));
+            rotation += 0.0001f;
 
             //printf("-----\n");
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
             for (int i = 0; i < 24; i+=2)
             {
-                glm::vec4 pos1 = post_trans * proj_mat * model_mat * glm::vec4( cube[i], 1.0f );
-                glm::vec4 pos2 = post_trans * proj_mat * model_mat * glm::vec4( cube[i+1], 1.0f );
+                glm::vec4 pos1 = proj_mat * view_mat * model_mat * glm::vec4( cube[i], 1.0f );
+                glm::vec4 pos2 = proj_mat * view_mat * model_mat * glm::vec4( cube[i+1], 1.0f );
+                pos1.w = 1.0f;
+                pos2.w = 1.0f;
+                pos1 = post_trans * pos1;
+                pos2 = post_trans * pos2;
                 SDL_Point p1 = {(int)pos1.x,(int)pos1.y};
                 SDL_Point p2 = {(int)pos2.x,(int)pos2.y};
 
@@ -190,6 +177,46 @@ int main(int argc, char** argv)
 
                 SDL_RenderDrawLine( renderer, p1.x, p1.y, p2.x, p2.y );
             }
+
+            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+            glm::vec4 pos1 = proj_mat * view_mat * glm::vec4( 0.0f,0.0f,0.0f,1.0f );
+            glm::vec4 pos2 = proj_mat * view_mat * glm::vec4( 1.0f,0.0f,0.0f, 1.0f );
+            pos1.w = 1.0f;
+            pos2.w = 1.0f;
+
+            // printf("(%f,%f,%f,%f) -> (%f,%f,%f,%f)\n", pos1.x, pos1.y, pos1.z, pos1.w, pos2.x, pos2.y, pos2.z, pos2.w );
+            pos1 = post_trans * pos1;
+            pos2 = post_trans * pos2;
+            // printf("(%f,%f,%f) -> (%f,%f,%f)\n", pos1.x, pos1.y, pos1.z, pos2.x, pos2.y, pos2.z );
+            SDL_Point p1 = {(int)pos1.x,(int)pos1.y};
+            SDL_Point p2 = {(int)pos2.x,(int)pos2.y};
+            //printf("(%d,%d) -> (%d,%d)\n", p1.x, p1.y, p2.x, p2.y );
+            SDL_RenderDrawLine( renderer, p1.x, p1.y, p2.x, p2.y );
+            {
+                SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+                glm::vec4 pos1 = proj_mat * view_mat * glm::vec4( 0.0f,0.0f,0.0f,1.0f );
+                glm::vec4 pos2 = proj_mat * view_mat * glm::vec4( 0.0f,1.0f,0.0f, 1.0f );
+                pos1.w = 1.0f;
+                pos2.w = 1.0f;
+                pos1 = post_trans * pos1;
+                pos2 = post_trans * pos2;
+                SDL_Point p1 = {(int)pos1.x,(int)pos1.y};
+                SDL_Point p2 = {(int)pos2.x,(int)pos2.y};
+                //printf("(%d,%d) -> (%d,%d)\n", p1.x, p1.y, p2.x, p2.y );
+                SDL_RenderDrawLine( renderer, p1.x, p1.y, p2.x, p2.y );
+                SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+                pos1 = proj_mat * view_mat * glm::vec4( 0.0f,0.0f,0.0f,1.0f );
+                pos2 = proj_mat * view_mat * glm::vec4( 0.0f,0.0f,1.0f, 1.0f );
+                pos1.w = 1.0f;
+                pos2.w = 1.0f;
+                pos1 = post_trans * pos1;
+                pos2 = post_trans * pos2;
+                p1 = {(int)pos1.x,(int)pos1.y};
+                p2 = {(int)pos2.x,(int)pos2.y};
+                //printf("(%d,%d) -> (%d,%d)\n", p1.x, p1.y, p2.x, p2.y );
+                SDL_RenderDrawLine( renderer, p1.x, p1.y, p2.x, p2.y );
+            }
+
         }
 		
         SDL_RenderPresent(renderer);
