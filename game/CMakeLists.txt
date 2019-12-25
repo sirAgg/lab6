@@ -24,12 +24,12 @@ add_subdirectory(deps/glm)
 project(game)
 
 add_executable(game
-    main.cpp
-    Point2D.cpp
-    Shape.cpp
-    Rectangle.cpp
-    Triangle.cpp
-    Circle.cpp
+    src/main.cpp
+    src/Point2D.cpp
+    src/Shape.cpp
+    src/Rectangle.cpp
+    src/Triangle.cpp
+    src/Circle.cpp
 )
 
 
