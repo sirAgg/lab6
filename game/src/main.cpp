@@ -11,6 +11,7 @@
 #include "Rectangle.h"
 #include "Triangle.h"
 #include "Circle.h"
+#include "autogen/space_ship_model.cpp"
 
 const int window_width  = 1000;
 const int window_height = 800;
@@ -47,6 +48,28 @@ glm::vec3 cube[]
     {1.0f,1.0f,1.0f},
     {1.0f,1.0f,0.0f}
 };
+
+void render_model( SDL_Renderer* renderer, Model& model, glm::mat4& post_trans, glm::mat4& proj_mat, glm::mat4& view_mat, glm::mat4& model_mat)
+{
+    SDL_Point* points = new SDL_Point[model.n_points];
+
+    for (int i = 0; i < model.n_points; i++)
+    {
+        glm::vec4 pos = proj_mat * view_mat * model_mat * glm::vec4( model.points[i], 1.0f );
+
+        pos /= pos.w;
+        pos = post_trans * pos;
+
+        points[i] = {(int)pos.x,(int)pos.y};
+    }
+
+    for(int i = 0; i < model.n_lines; i++)
+    {
+        SDL_Point& p1 = points[model.lines[i].a];
+        SDL_Point& p2 = points[model.lines[i].b];
+            SDL_RenderDrawLine( renderer, p1.x, p1.y, p2.x, p2.y );
+    }
+}
 
 void print_two_vec3(glm::vec3& v1, glm::vec3& v2)
 {
@@ -124,28 +147,30 @@ int main(int argc, char** argv)
 
         { // render wireframe cube
             glm::mat4 model_mat = glm::mat4(1.0f);
+            model_mat = glm::translate(model_mat, glm::vec3( 0.0f, 0.0f, 2.0f ));
             model_mat = glm::rotate(model_mat, rotation, glm::vec3(1.0f, 0.5f, 0.7f));
             model_mat = glm::scale(model_mat, glm::vec3( 0.3f ) );
-            model_mat = glm::translate(model_mat, glm::vec3( -0.5f, -0.5f, -0.5f ));
             rotation += 0.0001f;
 
             // printf("-----\n");
             SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-            for (int i = 0; i < 24; i+=2)
-            {
-                glm::vec4 pos1 = proj_mat * view_mat * model_mat * glm::vec4( cube[i], 1.0f );
-                glm::vec4 pos2 = proj_mat * view_mat * model_mat * glm::vec4( cube[i+1], 1.0f );
+            render_model(renderer, space_ship_model, post_trans, proj_mat, view_mat, model_mat);
 
-                pos1 /= pos1.w;
-                pos2 /= pos2.w;
+            // for (int i = 0; i < 24; i+=2)
+            // {
+            //     glm::vec4 pos1 = proj_mat * view_mat * model_mat * glm::vec4( cube[i], 1.0f );
+            //     glm::vec4 pos2 = proj_mat * view_mat * model_mat * glm::vec4( cube[i+1], 1.0f );
 
-                pos1 = post_trans * pos1;
-                pos2 = post_trans * pos2;
-                SDL_Point p1 = {(int)pos1.x,(int)pos1.y};
-                SDL_Point p2 = {(int)pos2.x,(int)pos2.y};
+            //     pos1 /= pos1.w;
+            //     pos2 /= pos2.w;
 
-                SDL_RenderDrawLine( renderer, p1.x, p1.y, p2.x, p2.y );
-            }
+            //     pos1 = post_trans * pos1;
+            //     pos2 = post_trans * pos2;
+            //     SDL_Point p1 = {(int)pos1.x,(int)pos1.y};
+            //     SDL_Point p2 = {(int)pos2.x,(int)pos2.y};
+
+            //     SDL_RenderDrawLine( renderer, p1.x, p1.y, p2.x, p2.y );
+            // }
 
             SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
             glm::vec4 pos1 = view_mat * glm::vec4( 0.0f,0.0f,0.0f,1.0f );
