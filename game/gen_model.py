@@ -2,8 +2,13 @@
 
 from os import walk
 
-content_prefix = """
+content_prefix = """#ifndef __{0}_H_
+#define __{0}_H_
+
 #include "../Model.h"
+"""
+content_postfix = """
+#endif
 """
 
 def gen_file(directory, out_dir, filename):
@@ -12,26 +17,26 @@ def gen_file(directory, out_dir, filename):
 
     state = 'vertices'
 
-    new_filename = out_dir + '/' + filename[:-4] + "_model.cpp"
+    new_filename = out_dir + '/' + filename[:-4] + "_model.h"
     obj_name = filename[:-4] + "_model"
     with open(directory + '/' + filename) as obj_file:
         with open(new_filename, 'w') as c_file:
-            c_file.write(content_prefix + "\n")
+            c_file.write(content_prefix.format(obj_name.upper()) + "\n")
             c_file.write("glm::vec3 " + obj_name + "_points[] = {\n")
             for line in obj_file.readlines():
-                if line[0] == 'v':
-                    c_file.write( '    {' + ', '.join(line.split()[1:]) + '},\n')
+                words = line.split()
+                if words[0] == 'v':
+                    c_file.write( '    {' + ', '.join(words[1:]) + '},\n')
                     n_points += 1
-                elif line[0] == 'l':
+                elif words[0] == 'l':
                     if state == 'vertices':
                         state = 'lines'
                         c_file.write('};\nLine ' + obj_name +'_lines[] = {\n')
-                    words = line.split()
                     c_file.write( '    {' + str(int(words[1])-1) + ', ' + str(int(words[2])-1) + '},\n')
                     n_lines += 1
 
             c_file.write( '};\n')
-            c_file.write("Model " + obj_name + " = { (glm::vec3*)&" + obj_name + "_points, " + str(n_points) + ", (Line*)&" + obj_name + "_lines, " + str(n_lines) + "};\n")
+            c_file.write("Model " + obj_name + " = { (glm::vec3*)&" + obj_name + "_points, " + str(n_points) + ", (Line*)&" + obj_name + "_lines, " + str(n_lines) + "};\n" + content_postfix)
 
     print( directory + '/' + filename + '  -->  ' + new_filename)
 

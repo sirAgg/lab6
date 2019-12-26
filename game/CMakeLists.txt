@@ -30,6 +30,10 @@ add_executable(game
     src/Rectangle.cpp
     src/Triangle.cpp
     src/Circle.cpp
+    src/ModelShape.cpp
+    src/GameObject.cpp
+    src/SpaceShip.cpp
+    src/Game.cpp
 )
 
 
