@@ -55,7 +55,6 @@ Game::Game(int window_width, int window_height)
 
     ModelShape* space_ship_m = new ModelShape(Point2D(), 0xFFFF00FF, &space_ship_model, &pv_mat);
     space_ship = new SpaceShip(Point2D(0.0f,0.0f), space_ship_m);
-    shapes.push_back(space_ship_m);
 
     spawn_asteroid();
 
@@ -64,8 +63,8 @@ Game::Game(int window_width, int window_height)
 
 Game::~Game()
 {
-    for(auto shape : shapes )
-        delete shape;
+    for(auto asteroid : asteroids )
+        delete asteroid;
 
     SDL_DestroyWindow(window);
     SDL_Quit();
@@ -91,8 +90,7 @@ bool Game::update()
     if(!process_events())
         return false;
 
-    if(input_map & ACTION_LEFT) space_ship->move_left();
-    if(input_map & ACTION_RIGHT) space_ship->move_right();
+    space_ship->input_update(input_map);
 
     space_ship->update();
     space_ship->update_model_mat();
@@ -123,16 +121,10 @@ bool Game::update()
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
-    for(auto it = shapes.begin(); it != shapes.end(); it++)
-    {
-        if((*it)->is_alive())
-            (*it)->render(renderer);
-        else
-        {
-            delete (*it);
-            shapes.erase(it);
-        }
-    }
+    for(auto asteroid: asteroids)
+        asteroid->render(renderer);
+
+    space_ship->render(renderer);
 
     // render orientation indicator
     /*
@@ -205,5 +197,4 @@ void Game::spawn_asteroid()
 {
     ModelShape* asteroid_m = new ModelShape(Point2D(), 0xFFFFFFFF, &asteroid_1_model, &pv_mat);
     asteroids.push_back(new Asteroid(Point2D(0.0f, -100.0f), asteroid_m, glm::vec3(1.0f,1.0f,1.0f), 0.2, 0.1f));
-    shapes.push_back(asteroid_m);
 }

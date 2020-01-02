@@ -10,8 +10,11 @@ class GameObject
 {
 public:
     GameObject(Point2D pos, ModelShape* shape);
+    virtual ~GameObject();
+
     virtual void update() = 0;
     virtual void update_model_mat();
+    void render(SDL_Renderer* renderer);
 
     const Point2D& get_position() const;
     Shape* get_shape();

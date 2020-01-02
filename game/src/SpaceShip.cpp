@@ -26,22 +26,25 @@ void SpaceShip::update_model_mat()
     glm::mat4 m = glm::translate(glm::mat4(1.0f), glm::vec3(position.get_x(), position.get_y(), 0.0f));
     m = glm::rotate(m, glm::radians(-90.0f), glm::vec3(1.0f,0.0f,0.0f));
     m = glm::rotate(m, 0.3f * (position.get_x() - target_x) , glm::vec3(0.0f,0.0f,1.0f));
-    m = glm::rotate(m, 0.3f * (position.get_x() - target_x) , glm::vec3(0.0f,1.0f,0.0f));
+    m = glm::rotate(m, 0.4f * (position.get_x() - target_x) , glm::vec3(0.0f,1.0f,0.0f));
     m = glm::scale(m, glm::vec3(1.0f,1.0f,-1.0f));
     shape->set_model_mat(m);
 }
 
-void SpaceShip::move_left()
+void SpaceShip::input_update(InputActions input)
 {
-    target_x -= TARGET_MOVE_SPEED;
+    if(input & ACTION_LEFT)
+    {
+        target_x -= TARGET_MOVE_SPEED;
 
-    if(target_x < -BORDER_DISTANCE)
-        target_x = -BORDER_DISTANCE;
-}
+        if(target_x < -BORDER_DISTANCE)
+            target_x = -BORDER_DISTANCE;
+    }
 
-void SpaceShip::move_right()
-{
-    target_x += TARGET_MOVE_SPEED;
-    if(target_x > BORDER_DISTANCE)
-        target_x = BORDER_DISTANCE;
+    if(input & ACTION_RIGHT)
+    {
+        target_x += TARGET_MOVE_SPEED;
+        if(target_x > BORDER_DISTANCE)
+            target_x = BORDER_DISTANCE;
+    }
 }

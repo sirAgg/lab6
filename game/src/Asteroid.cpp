@@ -12,11 +12,6 @@ Asteroid::Asteroid( Point2D pos, ModelShape* shape, glm::vec3 rotation_axis, flo
     rotation = 0.0f;
 }
 
-Asteroid::~Asteroid()
-{
-    shape->destroy();
-}
-
 void Asteroid::update()
 {
     rotation = rotation + rotation_speed;

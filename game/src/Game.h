@@ -36,8 +36,6 @@ private:
     glm::mat4 pv_mat;  // projection view matrix
     glm::vec3 camera_pos;
 
-    std::vector<Shape*> shapes;
-
     // GameObjects
     SpaceShip* space_ship;
     std::vector<Asteroid*> asteroids;
