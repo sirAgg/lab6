@@ -8,12 +8,10 @@ ModelShape::ModelShape(Point2D pos, Color color, Model* model, glm::mat4* pv_mat
 
 void ModelShape::render(SDL_Renderer* renderer)
 {
-    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
-
-    SDL_Point* points = new SDL_Point[model->n_points];
-
     glm::mat4 entire_trans_mat = *pv_mat * model_mat;
 
+
+    SDL_Point* points = new SDL_Point[model->n_points];
     for (int i = 0; i < model->n_points; i++)
     {
         glm::vec4 pos = entire_trans_mat * glm::vec4( model->points[i], 1.0f );
@@ -21,6 +19,7 @@ void ModelShape::render(SDL_Renderer* renderer)
         points[i] = {(int)pos.x,(int)pos.y};
     }
 
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
     for(int i = 0; i < model->n_lines; i++)
     {
         SDL_Point& p1 = points[model->lines[i].a];

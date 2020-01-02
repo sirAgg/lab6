@@ -20,9 +20,13 @@ public:
 	void set_position(const Point2D& p);
 	void set_color(const Color& p);
 
+    void destroy();
+    bool is_alive();
+
 protected:
     Color color;
     Point2D position;
+    bool alive = true;
 };
 
 #endif /* SHAPE_H */

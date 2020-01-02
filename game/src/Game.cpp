@@ -1,5 +1,7 @@
 #include "Game.h"
 
+#include <algorithm>
+
 #include "glm/gtc/matrix_transform.hpp"
 
 #include "Triangle.h"
@@ -28,6 +30,7 @@ Game::Game(int window_width, int window_height)
     //
     // Create projection and view matrices
     //
+    camera_pos = glm::vec3(0.0f,3.0f,7.0f);
     {
         // matrix for mapping homogeneous coordinates to screen-coordinates
         glm::mat4 post_trans = glm::mat4(1.0f);
@@ -39,8 +42,9 @@ Game::Game(int window_width, int window_height)
 
         // create view matrix
         glm::mat4 view_mat = glm::mat4(1.0f);
-        view_mat = glm::translate(view_mat, glm::vec3(0.0f,0.0f,-2.0f));
-        view_mat = glm::scale(view_mat, glm::vec3(0.3f, 0.3f, -0.3f));
+        view_mat = glm::scale(view_mat, glm::vec3(0.3f));
+        view_mat = glm::translate(view_mat, -camera_pos);
+        view_mat = glm::rotate(view_mat, glm::radians(90.0f + 20.0f), glm::vec3(1.0f,0.0f,0.0f));
 
         pv_mat = post_trans * proj_mat * view_mat;
     }
@@ -50,10 +54,12 @@ Game::Game(int window_width, int window_height)
     //  
 
     ModelShape* space_ship_m = new ModelShape(Point2D(), 0xFFFF00FF, &space_ship_model, &pv_mat);
-    space_ship = new SpaceShip(glm::vec3(0.0f), space_ship_m);
+    space_ship = new SpaceShip(Point2D(0.0f,0.0f), space_ship_m);
     shapes.push_back(space_ship_m);
 
-    shapes.push_back(new ModelShape(Point2D(), 0xFFFFFFFF, &asteroid_1_model, &pv_mat));
+    spawn_asteroid();
+
+    asteroid_spawn_timer = ASTEROID_SPAWN_TIMER_START;
 }
 
 Game::~Game()
@@ -71,8 +77,9 @@ void Game::run()
 
     while (update())
     {
-        if(start_time < 16)
-            SDL_Delay(16-start_time);
+        int delta_time = SDL_GetTicks()-start_time;
+        if(delta_time < 16)
+            SDL_Delay(16-delta_time);
 
         start_time = SDL_GetTicks();
     }
@@ -81,6 +88,84 @@ void Game::run()
 bool Game::update()
 {
     // event handeling
+    if(!process_events())
+        return false;
+
+    if(input_map & ACTION_LEFT) space_ship->move_left();
+    if(input_map & ACTION_RIGHT) space_ship->move_right();
+
+    space_ship->update();
+    space_ship->update_model_mat();
+
+    if(asteroid_spawn_timer <= 0)
+    {
+        spawn_asteroid();
+        asteroid_spawn_timer = ASTEROID_SPAWN_TIMER_START;
+    }
+    else
+        asteroid_spawn_timer--;
+
+    for(auto it = asteroids.begin(); it != asteroids.end(); it++)
+    {
+        (*it)->update();
+        if((*it)->get_position().get_y() > camera_pos.y - 1.0f)
+        {
+            delete (*it);
+            asteroids.erase(it);
+        }
+        else
+            (*it)->update_model_mat();
+    }
+
+    //
+    // rendering
+    //
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+
+    for(auto it = shapes.begin(); it != shapes.end(); it++)
+    {
+        if((*it)->is_alive())
+            (*it)->render(renderer);
+        else
+        {
+            delete (*it);
+            shapes.erase(it);
+        }
+    }
+
+    // render orientation indicator
+    /*
+    {
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        glm::vec4 pos1 = pv_mat * glm::vec4( 0.0f,0.0f,0.0f,1.0f );
+        glm::vec4 pos2 = pv_mat * glm::vec4( 1.0f,0.0f,0.0f, 1.0f );
+        pos1 /= pos1.w;
+        pos2 /= pos2.w;
+        SDL_Point p1 = {(int)pos1.x,(int)pos1.y};
+        SDL_Point p2 = {(int)pos2.x,(int)pos2.y};
+        SDL_RenderDrawLine( renderer, p1.x, p1.y, p2.x, p2.y );
+        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+        pos2 = pv_mat * glm::vec4( 0.0f,1.0f,0.0f, 1.0f );
+        pos2 /= pos2.w;
+        p2 = {(int)pos2.x,(int)pos2.y};
+        SDL_RenderDrawLine( renderer, p1.x, p1.y, p2.x, p2.y );
+
+        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+        pos2 = pv_mat * glm::vec4( 0.0f,0.0f,-1.0f, 1.0f );
+        pos2 /= pos2.w;
+        p2 = {(int)pos2.x,(int)pos2.y};
+        SDL_RenderDrawLine( renderer, p1.x, p1.y, p2.x, p2.y );
+    }
+    */
+
+    SDL_RenderPresent(renderer);
+
+    return true;
+}
+
+bool Game::process_events()
+{
     SDL_Event event;
     while(SDL_PollEvent(&event))
     {
@@ -113,48 +198,12 @@ bool Game::update()
                 break;
         }
     }
-
-    if(input_map & ACTION_UP) space_ship->move_up();
-    if(input_map & ACTION_DOWN) space_ship->move_down();
-    if(input_map & ACTION_LEFT) space_ship->move_left();
-    if(input_map & ACTION_RIGHT) space_ship->move_right();
-
-    space_ship->update();
-    space_ship->update_model_mat();
-
-    //
-    // rendering
-    //
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
-
-    for(auto shape: shapes)
-        shape->render(renderer);
-
-    // render orientation indicator
-    {
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        glm::vec4 pos1 = pv_mat * glm::vec4( 0.0f,0.0f,0.0f,1.0f );
-        glm::vec4 pos2 = pv_mat * glm::vec4( 1.0f,0.0f,0.0f, 1.0f );
-        pos1 /= pos1.w;
-        pos2 /= pos2.w;
-        SDL_Point p1 = {(int)pos1.x,(int)pos1.y};
-        SDL_Point p2 = {(int)pos2.x,(int)pos2.y};
-        SDL_RenderDrawLine( renderer, p1.x, p1.y, p2.x, p2.y );
-        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-        pos2 = pv_mat * glm::vec4( 0.0f,1.0f,0.0f, 1.0f );
-        pos2 /= pos2.w;
-        p2 = {(int)pos2.x,(int)pos2.y};
-        SDL_RenderDrawLine( renderer, p1.x, p1.y, p2.x, p2.y );
-
-        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
-        pos2 = pv_mat * glm::vec4( 0.0f,0.0f,-1.0f, 1.0f );
-        pos2 /= pos2.w;
-        p2 = {(int)pos2.x,(int)pos2.y};
-        SDL_RenderDrawLine( renderer, p1.x, p1.y, p2.x, p2.y );
-    }
-
-    SDL_RenderPresent(renderer);
-
     return true;
+}
+
+void Game::spawn_asteroid()
+{
+    ModelShape* asteroid_m = new ModelShape(Point2D(), 0xFFFFFFFF, &asteroid_1_model, &pv_mat);
+    asteroids.push_back(new Asteroid(Point2D(0.0f, -100.0f), asteroid_m, glm::vec3(1.0f,1.0f,1.0f), 0.2, 0.1f));
+    shapes.push_back(asteroid_m);
 }

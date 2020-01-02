@@ -11,3 +11,13 @@ Color Shape::get_color() { return color; }
 
 void Shape::set_position(const Point2D& p) { position = p; }
 void Shape::set_color(const Color& p) { color = p; }
+
+void Shape::destroy()
+{
+    alive = false;
+}
+
+bool Shape::is_alive()
+{
+    return alive;
+}

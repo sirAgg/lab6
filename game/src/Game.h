@@ -8,11 +8,10 @@
 
 #include "Shape.h"
 #include "SpaceShip.h"
+#include "Asteroid.h"
+#include "InputActions.h"
 
-const unsigned char ACTION_UP = 1;
-const unsigned char ACTION_DOWN = 1 << 1;
-const unsigned char ACTION_LEFT = 1 << 2;
-const unsigned char ACTION_RIGHT = 1 << 3;
+const int ASTEROID_SPAWN_TIMER_START = 120;
 
 class Game
 {
@@ -23,6 +22,9 @@ public:
     void run();
 
     bool update();
+    bool process_events();
+
+    void spawn_asteroid();
 
 private:
     int window_width, window_height;
@@ -31,15 +33,18 @@ private:
 
     // Caching of projection matrix
     glm::mat4 proj_mat;
-
-    // projection view matrix
-    glm::mat4 pv_mat;
+    glm::mat4 pv_mat;  // projection view matrix
+    glm::vec3 camera_pos;
 
     std::vector<Shape*> shapes;
 
+    // GameObjects
     SpaceShip* space_ship;
+    std::vector<Asteroid*> asteroids;
 
-    unsigned char input_map;
+    InputActions input_map;
+
+    int asteroid_spawn_timer = 0;
 };
 
 #endif // __GAME_H_
