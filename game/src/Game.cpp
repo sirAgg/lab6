@@ -1,6 +1,8 @@
 #include "Game.h"
 
 #include <algorithm>
+#include <cstdlib>
+#include <time.h>
 
 #include "glm/gtc/matrix_transform.hpp"
 
@@ -19,6 +21,7 @@ Game::Game(int window_width, int window_height)
     :window_width(window_width), window_height(window_height)
 {
     current_game = this;
+    srand(time(0));
     //
     // Initialize SDL
     //
@@ -64,7 +67,6 @@ Game::Game(int window_width, int window_height)
     space_ship = new SpaceShip(Point2D(0.0f,0.0f), space_ship_m);
 
     spawn_asteroid();
-    spawn_lazer_shot(Point2D(0.0f,-5.0f));
 
     asteroid_spawn_timer = ASTEROID_SPAWN_TIMER_START;
 }
@@ -102,9 +104,10 @@ bool Game::update()
 
     space_ship->input_update(inputs);
 
-    space_ship->update();
-    space_ship->update_model_mat();
 
+    //
+    // Spawn Asteroid
+    //
     if(asteroid_spawn_timer <= 0)
     {
         spawn_asteroid();
@@ -112,6 +115,13 @@ bool Game::update()
     }
     else
         asteroid_spawn_timer--;
+
+
+    //
+    // Update All GameObjects
+    //
+    space_ship->update();
+    space_ship->update_model_mat();
 
     for(auto it = asteroids.begin(); it != asteroids.end(); it++)
     {
@@ -142,7 +152,7 @@ bool Game::update()
     }
 
     //
-    // rendering
+    // Rendering
     //
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
@@ -198,10 +208,14 @@ bool Game::process_events()
 
 void Game::spawn_asteroid()
 {
-    ModelShape* asteroid_m = new ModelShape(Point2D(), 0xFFFFFFFF, &asteroid_1_model, &pv_mat);
-    asteroids.push_back(new Asteroid(Point2D(0.0f, -100.0f), asteroid_m, glm::vec3(1.0f,1.0f,1.0f), asteroid_speed, 0.1f, camera_pos.y+2.0f, 7.0f));
+    Point2D pos;
+    pos.set_x((float)rand()/(float)RAND_MAX*GAME_FIELD_WIDTH*2.0f - GAME_FIELD_WIDTH);
+    pos.set_y(-100.0f);
 
-    asteroid_speed += 0.005f;
+    ModelShape* asteroid_m = new ModelShape(Point2D(), 0xFFFFFFFF, &asteroid_1_model, &pv_mat);
+    asteroids.push_back(new Asteroid(pos, asteroid_m, glm::vec3(1.0f,1.0f,1.0f), asteroid_speed, 0.1f, camera_pos.y+2.0f, 7.0f));
+
+    asteroid_speed += 0.01f;
 }
 
 void Game::spawn_lazer_shot(Point2D pos)

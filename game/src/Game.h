@@ -13,6 +13,7 @@
 #include "InputActions.h"
 
 const int ASTEROID_SPAWN_TIMER_START = 120;
+const float GAME_FIELD_WIDTH = 7.0f;
 
 class Game
 {
@@ -54,7 +55,7 @@ private:
 
     float asteroid_speed = 0.2f;
 
-    InputActions inputs;
+    InputActions inputs = 0;
 
     int asteroid_spawn_timer = 0;
 

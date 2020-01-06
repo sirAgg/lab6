@@ -7,7 +7,6 @@
 
 const float MOVE_FACTOR = 0.1f;
 const float TARGET_MOVE_SPEED = 0.15f;
-const float BORDER_DISTANCE = 7.0f;
 const float SPACE_SHIP_SIZE = 0.8f;
 const int SHOOTING_COOLDOWN_MAX_TIME = 15;
 
@@ -53,15 +52,15 @@ void SpaceShip::input_update(InputActions input)
     {
         target_x -= TARGET_MOVE_SPEED;
 
-        if(target_x < -BORDER_DISTANCE)
-            target_x = -BORDER_DISTANCE;
+        if(target_x < -GAME_FIELD_WIDTH)
+            target_x = -GAME_FIELD_WIDTH;
     }
 
     if(input & ACTION_RIGHT)
     {
         target_x += TARGET_MOVE_SPEED;
-        if(target_x > BORDER_DISTANCE)
-            target_x = BORDER_DISTANCE;
+        if(target_x > GAME_FIELD_WIDTH)
+            target_x = GAME_FIELD_WIDTH;
     }
 
     if(input & ACTION_UP && shooting_cooldown <= 0)
