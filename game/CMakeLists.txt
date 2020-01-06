@@ -34,6 +34,7 @@ add_executable(game
     src/GameObject.cpp
     src/SpaceShip.cpp
     src/Asteroid.cpp
+    src/LazerShot.cpp
     src/Game.cpp
 )
 

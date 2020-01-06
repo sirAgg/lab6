@@ -4,14 +4,21 @@
 
 #include "glm/gtc/matrix_transform.hpp"
 
-#include "Triangle.h"
 #include "ModelShape.h"
 #include "autogen/space_ship_model.h"
 #include "autogen/asteroid_1_model.h"
 
+Game* Game::current_game;
+
+Game* Game::get_game()
+{
+    return current_game;
+}
+
 Game::Game(int window_width, int window_height)
     :window_width(window_width), window_height(window_height)
 {
+    current_game = this;
     //
     // Initialize SDL
     //
@@ -57,6 +64,7 @@ Game::Game(int window_width, int window_height)
     space_ship = new SpaceShip(Point2D(0.0f,0.0f), space_ship_m);
 
     spawn_asteroid();
+    spawn_lazer_shot(Point2D(0.0f,-5.0f));
 
     asteroid_spawn_timer = ASTEROID_SPAWN_TIMER_START;
 }
@@ -68,6 +76,8 @@ Game::~Game()
 
     SDL_DestroyWindow(window);
     SDL_Quit();
+
+    printf("You reached a score of: %d\n", score);
 }
 
 void Game::run()
@@ -90,7 +100,7 @@ bool Game::update()
     if(!process_events())
         return false;
 
-    space_ship->input_update(input_map);
+    space_ship->input_update(inputs);
 
     space_ship->update();
     space_ship->update_model_mat();
@@ -105,14 +115,30 @@ bool Game::update()
 
     for(auto it = asteroids.begin(); it != asteroids.end(); it++)
     {
-        (*it)->update();
-        if((*it)->get_position().get_y() > camera_pos.y - 1.0f)
+        if((*it)->update())
         {
-            delete (*it);
-            asteroids.erase(it);
+            (*it)->update_model_mat();
         }
         else
+        {
+            delete (*it);
+            it = asteroids.erase(it);
+            it--;
+        }
+    }
+    
+    for(auto it = lazer_shots.begin(); it != lazer_shots.end(); it++)
+    {
+        if((*it)->update())
+        {
             (*it)->update_model_mat();
+        }
+        else
+        {
+            delete (*it);
+            it = lazer_shots.erase(it);
+            it--;
+        }
     }
 
     //
@@ -121,35 +147,12 @@ bool Game::update()
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
+    for(auto lazer: lazer_shots)
+        lazer->render(renderer);
     for(auto asteroid: asteroids)
         asteroid->render(renderer);
 
     space_ship->render(renderer);
-
-    // render orientation indicator
-    /*
-    {
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        glm::vec4 pos1 = pv_mat * glm::vec4( 0.0f,0.0f,0.0f,1.0f );
-        glm::vec4 pos2 = pv_mat * glm::vec4( 1.0f,0.0f,0.0f, 1.0f );
-        pos1 /= pos1.w;
-        pos2 /= pos2.w;
-        SDL_Point p1 = {(int)pos1.x,(int)pos1.y};
-        SDL_Point p2 = {(int)pos2.x,(int)pos2.y};
-        SDL_RenderDrawLine( renderer, p1.x, p1.y, p2.x, p2.y );
-        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-        pos2 = pv_mat * glm::vec4( 0.0f,1.0f,0.0f, 1.0f );
-        pos2 /= pos2.w;
-        p2 = {(int)pos2.x,(int)pos2.y};
-        SDL_RenderDrawLine( renderer, p1.x, p1.y, p2.x, p2.y );
-
-        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
-        pos2 = pv_mat * glm::vec4( 0.0f,0.0f,-1.0f, 1.0f );
-        pos2 /= pos2.w;
-        p2 = {(int)pos2.x,(int)pos2.y};
-        SDL_RenderDrawLine( renderer, p1.x, p1.y, p2.x, p2.y );
-    }
-    */
 
     SDL_RenderPresent(renderer);
 
@@ -170,19 +173,19 @@ bool Game::process_events()
             // handle Keyboard input
             case SDL_KEYDOWN:
                 switch (event.key.keysym.sym) {
-                    case SDLK_UP: input_map |= ACTION_UP; break;
-                    case SDLK_DOWN: input_map |= ACTION_DOWN; break;
-                    case SDLK_LEFT: input_map |= ACTION_LEFT; break;
-                    case SDLK_RIGHT: input_map |= ACTION_RIGHT; break;
+                    case SDLK_UP: inputs |= ACTION_UP; break;
+                    case SDLK_DOWN: inputs |= ACTION_DOWN; break;
+                    case SDLK_LEFT: inputs |= ACTION_LEFT; break;
+                    case SDLK_RIGHT: inputs |= ACTION_RIGHT; break;
                     default:
                         break;
                 } break;
             case SDL_KEYUP:
                 switch (event.key.keysym.sym) {
-                    case SDLK_UP: input_map &= ~ACTION_UP; break;
-                    case SDLK_DOWN: input_map &= ~ACTION_DOWN; break;
-                    case SDLK_LEFT: input_map &= ~ACTION_LEFT; break;
-                    case SDLK_RIGHT: input_map &= ~ACTION_RIGHT; break;
+                    case SDLK_UP: inputs &= ~ACTION_UP; break;
+                    case SDLK_DOWN: inputs &= ~ACTION_DOWN; break;
+                    case SDLK_LEFT: inputs &= ~ACTION_LEFT; break;
+                    case SDLK_RIGHT: inputs &= ~ACTION_RIGHT; break;
                     default:
                         break;
                 } break;
@@ -196,5 +199,23 @@ bool Game::process_events()
 void Game::spawn_asteroid()
 {
     ModelShape* asteroid_m = new ModelShape(Point2D(), 0xFFFFFFFF, &asteroid_1_model, &pv_mat);
-    asteroids.push_back(new Asteroid(Point2D(0.0f, -100.0f), asteroid_m, glm::vec3(1.0f,1.0f,1.0f), 0.2, 0.1f));
+    asteroids.push_back(new Asteroid(Point2D(0.0f, -100.0f), asteroid_m, glm::vec3(1.0f,1.0f,1.0f), asteroid_speed, 0.1f, camera_pos.y+2.0f, 7.0f));
+
+    asteroid_speed += 0.005f;
+}
+
+void Game::spawn_lazer_shot(Point2D pos)
+{
+    ModelShape* lazer_shot_m = new ModelShape(Point2D(), 0xFF5555FF, &LazerShot::lazer_shot_model, &pv_mat);
+    lazer_shots.push_back(new LazerShot(pos, lazer_shot_m, -0.4, -100.0f));
+}
+
+const std::vector<Asteroid*>* Game::get_asteroids()
+{
+    return &asteroids;
+}
+
+void Game::increase_score(int increase)
+{
+    score += increase;
 }

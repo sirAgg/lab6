@@ -2,8 +2,8 @@
 
 #include "glm/gtc/matrix_transform.hpp"
 
-GameObject::GameObject(Point2D pos, ModelShape* shape)
-    :position(pos), shape(shape)
+GameObject::GameObject(Point2D pos, ModelShape* shape, float radius)
+    :position(pos), shape(shape), radius(radius)
 {}
 
 GameObject::~GameObject()
@@ -30,4 +30,17 @@ const Point2D& GameObject::get_position() const
 Shape* GameObject::get_shape()
 {
     return shape;
+}
+
+float GameObject::get_radius() const
+{
+    return radius;
+}
+
+bool GameObject::is_colliding_with(const GameObject* other)
+{
+    float x_diff = position.get_x() - other->get_position().get_x();
+    float y_diff = position.get_y() - other->get_position().get_y();
+    float combined_radius = radius*radius + other->get_radius()*other->get_radius();
+    return  combined_radius > x_diff*x_diff + y_diff*y_diff;
 }

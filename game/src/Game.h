@@ -9,6 +9,7 @@
 #include "Shape.h"
 #include "SpaceShip.h"
 #include "Asteroid.h"
+#include "LazerShot.h"
 #include "InputActions.h"
 
 const int ASTEROID_SPAWN_TIMER_START = 120;
@@ -19,14 +20,24 @@ public:
     Game(int window_width, int window_height);
     virtual ~Game();
 
+    static Game* get_game();
+
     void run();
+
+    void spawn_asteroid();
+    void spawn_lazer_shot(Point2D pos);
+
+    void increase_score(int increase);
+
+    const std::vector<Asteroid*>* get_asteroids();
+
+private:
 
     bool update();
     bool process_events();
 
-    void spawn_asteroid();
+    static Game* current_game;
 
-private:
     int window_width, window_height;
     SDL_Window* window;
     SDL_Renderer* renderer;
@@ -39,10 +50,15 @@ private:
     // GameObjects
     SpaceShip* space_ship;
     std::vector<Asteroid*> asteroids;
+    std::vector<LazerShot*> lazer_shots;
 
-    InputActions input_map;
+    float asteroid_speed = 0.2f;
+
+    InputActions inputs;
 
     int asteroid_spawn_timer = 0;
+
+    int score = 0;
 };
 
 #endif // __GAME_H_

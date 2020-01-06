@@ -5,15 +5,13 @@
 #include "ModelShape.h"
 #include "InputActions.h"
 
-const float MOVE_FACTOR= 0.1f;
-const float TARGET_MOVE_SPEED = 0.15f;
 
 class SpaceShip : public GameObject
 {
 public:
     SpaceShip(Point2D pos, ModelShape* shape);
 
-    void update() override;
+    bool update() override;
     void update_model_mat() override;
     void input_update(InputActions input);
 
@@ -22,7 +20,7 @@ public:
 
 private:
     float target_x;
-        unsigned char* input_map;
+    int shooting_cooldown = 0;
 };
 
 #endif // __SPACESHIP_H_

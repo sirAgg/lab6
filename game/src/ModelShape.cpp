@@ -1,6 +1,6 @@
 #include "ModelShape.h"
 
-ModelShape::ModelShape(Point2D pos, Color color, Model* model, glm::mat4* pv_mat)
+ModelShape::ModelShape(Point2D pos, Color color, const Model* model, glm::mat4* pv_mat)
     :Shape(pos, color), model(model), pv_mat(pv_mat)
 {
     model_mat = glm::mat4(1.0f);

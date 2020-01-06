@@ -36,7 +36,7 @@ def gen_file(directory, out_dir, filename):
                     n_lines += 1
 
             c_file.write( '};\n')
-            c_file.write("Model " + obj_name + " = { (glm::vec3*)&" + obj_name + "_points, " + str(n_points) + ", (Line*)&" + obj_name + "_lines, " + str(n_lines) + "};\n" + content_postfix)
+            c_file.write("const Model " + obj_name + " = { (glm::vec3*)&" + obj_name + "_points, " + str(n_points) + ", (Line*)&" + obj_name + "_lines, " + str(n_lines) + "};\n" + content_postfix)
 
     print( directory + '/' + filename + '  -->  ' + new_filename)
 
