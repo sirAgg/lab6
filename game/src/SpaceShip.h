@@ -3,24 +3,24 @@
 
 #include "GameObject.h"
 #include "ModelShape.h"
-#include "InputActions.h"
 
 
 class SpaceShip : public GameObject
 {
 public:
-    SpaceShip(Point2D pos, ModelShape* shape);
+    SpaceShip(Point2D pos, int lives);
 
     bool update() override;
     void update_model_mat() override;
-    void input_update(InputActions input);
 
-
-    void set_target(const glm::vec2& target);
+    int get_lives();
 
 private:
+
     float target_x;
     int shooting_cooldown = 0;
+    int invincibility_time; 
+    int lives;
 };
 
 #endif // __SPACESHIP_H_

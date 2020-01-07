@@ -1,6 +1,5 @@
 #include "LazerShot.h"
 
-#include "Model.h"
 #include "Game.h"
 
 
@@ -26,7 +25,7 @@ const Model LazerShot::lazer_shot_model = {
     1
 };
 
-const float LAZER_SHOT_SIZE = 0.1f;
+const float LAZER_SHOT_SIZE = 0.2f;
 
 LazerShot::LazerShot(Point2D pos, ModelShape* shape, float speed, float stop_position):
     GameObject(pos, shape, LAZER_SHOT_SIZE), speed(speed), stop_position(stop_position)

@@ -3,7 +3,7 @@
 
 #include "../Model.h"
 
-glm::vec3 asteroid_1_model_points[] = {
+static glm::vec3 asteroid_1_model_points[] = {
     {0.314231, -0.130765, -0.623990},
     {0.862359, -0.668732, 0.249371},
     {-0.994573, 0.211731, -0.753188},
@@ -17,7 +17,7 @@ glm::vec3 asteroid_1_model_points[] = {
     {-0.521686, 0.087472, 0.737039},
     {0.940976, -0.207919, 0.592773},
 };
-Line asteroid_1_model_lines[] = {
+static Line asteroid_1_model_lines[] = {
     {2, 0},
     {0, 1},
     {3, 8},
@@ -49,6 +49,6 @@ Line asteroid_1_model_lines[] = {
     {0, 3},
     {1, 4},
 };
-Model asteroid_1_model = { (glm::vec3*)&asteroid_1_model_points, 12, (Line*)&asteroid_1_model_lines, 30};
+Model GeneratedModels::asteroid_1_model = { (glm::vec3*)&asteroid_1_model_points, 12, (Line*)&asteroid_1_model_lines, 30};
 
 #endif

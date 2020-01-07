@@ -2,6 +2,7 @@
 #define __LAZERSHOT_H_
 
 #include "GameObject.h"
+#include "ModelShape.h"
 #include "Model.h"
 
 

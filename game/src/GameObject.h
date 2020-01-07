@@ -4,12 +4,12 @@
 #include "glm/glm.hpp"
 
 #include "Point2D.h"
-#include "ModelShape.h"
+#include "Shape3D.h"
 
 class GameObject
 {
 public:
-    GameObject(Point2D pos, ModelShape* shape, float radius);
+    GameObject(Point2D pos, Shape3D* shape, float radius);
     virtual ~GameObject();
 
     virtual bool update() = 0;
@@ -24,7 +24,7 @@ public:
 
 protected:
     Point2D position;
-    ModelShape* shape;
+    Shape3D* shape;
     float radius;
 };
 

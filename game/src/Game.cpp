@@ -7,10 +7,12 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 #include "ModelShape.h"
-#include "autogen/space_ship_model.h"
-#include "autogen/asteroid_1_model.h"
+#include "FilledRectangle.h"
+#include "ParticleSystem.h"
+#include "autogen/generated_models.h"
 
 Game* Game::current_game;
+
 
 Game* Game::get_game()
 {
@@ -48,7 +50,7 @@ Game::Game(int window_width, int window_height)
         post_trans = glm::translate(post_trans, glm::vec3(1.0f, -1.0f, 0.0f));
 
         // create projection matrix
-        proj_mat = glm::perspective(glm::radians(90.0f), (float)window_width/(float)window_height, 0.1f, 100.0f);
+        glm::mat4 proj_mat = glm::perspective(glm::radians(90.0f), (float)window_width/(float)window_height, 0.1f, 100.0f);
 
         // create view matrix
         glm::mat4 view_mat = glm::mat4(1.0f);
@@ -63,18 +65,25 @@ Game::Game(int window_width, int window_height)
     // Spawn player
     //  
 
-    ModelShape* space_ship_m = new ModelShape(Point2D(), 0xFFFF00FF, &space_ship_model, &pv_mat);
-    space_ship = new SpaceShip(Point2D(0.0f,0.0f), space_ship_m);
+    space_ship = new SpaceShip(Point2D(0.0f,0.0f), MAX_LIVES);
 
     spawn_asteroid();
 
     asteroid_spawn_timer = ASTEROID_SPAWN_TIMER_START;
+
+    for(int i = 0; i < MAX_LIVES; i++)
+        lives_counter_ui.push_back(new FilledRectangle(Point2D(15+30*i, 15),0xAA0000FF, 20,20));
+
+    
 }
 
 Game::~Game()
 {
     for(auto asteroid : asteroids )
         delete asteroid;
+
+    for(auto shape: lives_counter_ui)
+        delete shape;
 
     SDL_DestroyWindow(window);
     SDL_Quit();
@@ -102,16 +111,14 @@ bool Game::update()
     if(!process_events())
         return false;
 
-    space_ship->input_update(inputs);
-
-
     //
     // Spawn Asteroid
     //
     if(asteroid_spawn_timer <= 0)
     {
         spawn_asteroid();
-        asteroid_spawn_timer = ASTEROID_SPAWN_TIMER_START;
+        asteroid_spawn_timer = asteroid_spawn_delay;
+        asteroid_spawn_delay--;
     }
     else
         asteroid_spawn_timer--;
@@ -121,35 +128,10 @@ bool Game::update()
     // Update All GameObjects
     //
     space_ship->update();
-    space_ship->update_model_mat();
-
-    for(auto it = asteroids.begin(); it != asteroids.end(); it++)
-    {
-        if((*it)->update())
-        {
-            (*it)->update_model_mat();
-        }
-        else
-        {
-            delete (*it);
-            it = asteroids.erase(it);
-            it--;
-        }
-    }
+    update_game_objects((std::vector<GameObject*>*)&asteroids);
+    update_game_objects((std::vector<GameObject*>*)&lazer_shots);
+    update_game_objects(&other_game_objects);
     
-    for(auto it = lazer_shots.begin(); it != lazer_shots.end(); it++)
-    {
-        if((*it)->update())
-        {
-            (*it)->update_model_mat();
-        }
-        else
-        {
-            delete (*it);
-            it = lazer_shots.erase(it);
-            it--;
-        }
-    }
 
     //
     // Rendering
@@ -157,6 +139,8 @@ bool Game::update()
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
+    for(auto object: other_game_objects)
+        object->render(renderer);
     for(auto lazer: lazer_shots)
         lazer->render(renderer);
     for(auto asteroid: asteroids)
@@ -164,9 +148,24 @@ bool Game::update()
 
     space_ship->render(renderer);
 
+    render_ui();
+
     SDL_RenderPresent(renderer);
 
     return true;
+}
+
+void Game::update_game_objects(std::vector<GameObject*>* objects)
+{
+    for(auto it = objects->begin(); it != objects->end(); it++)
+    {
+        if(!(*it)->update())
+        {
+            delete (*it);
+            it = objects->erase(it);
+            it--;
+        }
+    }
 }
 
 bool Game::process_events()
@@ -206,22 +205,50 @@ bool Game::process_events()
     return true;
 }
 
+void Game::render_ui()
+{
+    int i = 1;
+    if( space_ship->get_lives() < lives_counter_ui.size() && lives_counter_ui.size() >= 0 )
+        lives_counter_ui.pop_back();
+    for(auto s: lives_counter_ui)
+    {
+        s->render(renderer);    
+        i++;
+    }
+}
+
+void Game::spawn(GameObject* object)
+{
+    other_game_objects.push_back(object);
+}
+
 void Game::spawn_asteroid()
 {
     Point2D pos;
     pos.set_x((float)rand()/(float)RAND_MAX*GAME_FIELD_WIDTH*2.0f - GAME_FIELD_WIDTH);
     pos.set_y(-100.0f);
 
-    ModelShape* asteroid_m = new ModelShape(Point2D(), 0xFFFFFFFF, &asteroid_1_model, &pv_mat);
-    asteroids.push_back(new Asteroid(pos, asteroid_m, glm::vec3(1.0f,1.0f,1.0f), asteroid_speed, 0.1f, camera_pos.y+2.0f, 7.0f));
+    asteroids.push_back(new Asteroid(pos, glm::vec3(1.0f,1.0f,1.0f), asteroid_speed, 0.1f, camera_pos.y+2.0f, 7.0f));
 
-    asteroid_speed += 0.01f;
+    //asteroid_speed += 0.01f;
 }
 
 void Game::spawn_lazer_shot(Point2D pos)
 {
-    ModelShape* lazer_shot_m = new ModelShape(Point2D(), 0xFF5555FF, &LazerShot::lazer_shot_model, &pv_mat);
+    ModelShape* lazer_shot_m = new ModelShape(Point2D(), 0xFF5555FF, &LazerShot::lazer_shot_model);
     lazer_shots.push_back(new LazerShot(pos, lazer_shot_m, -0.4, -100.0f));
+}
+
+void Game::spawn_particles(Point2D pos)
+{
+    ParticleSystem* p = new ParticleSystem(pos, 0.0f, 0xFFFFFFFF, ParticleSystem::circle_particles, 8, 180, 90);
+    //p->set_time(1.0f);
+    other_game_objects.push_back(p);
+}
+
+void Game::increase_score(int increase)
+{
+    score += increase;
 }
 
 const std::vector<Asteroid*>* Game::get_asteroids()
@@ -229,7 +256,12 @@ const std::vector<Asteroid*>* Game::get_asteroids()
     return &asteroids;
 }
 
-void Game::increase_score(int increase)
+const InputActions Game::get_inputs() const
 {
-    score += increase;
+    return inputs;
+}
+
+const glm::mat4* Game::get_pv_mat() const
+{
+    return &pv_mat;
 }

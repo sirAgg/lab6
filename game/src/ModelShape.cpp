@@ -1,14 +1,16 @@
 #include "ModelShape.h"
 
-ModelShape::ModelShape(Point2D pos, Color color, const Model* model, glm::mat4* pv_mat)
-    :Shape(pos, color), model(model), pv_mat(pv_mat)
+#include "Game.h"
+
+ModelShape::ModelShape(Point2D pos, Color color, const Model* model)
+    :Shape3D(pos, color), model(model)
 {
     model_mat = glm::mat4(1.0f);
 }
 
 void ModelShape::render(SDL_Renderer* renderer)
 {
-    glm::mat4 entire_trans_mat = *pv_mat * model_mat;
+    glm::mat4 entire_trans_mat = *Game::get_game()->get_pv_mat() * model_mat;
 
 
     SDL_Point* points = new SDL_Point[model->n_points];
@@ -33,14 +35,4 @@ void ModelShape::render(SDL_Renderer* renderer)
     }
 
     delete[] points;
-}
-
-void ModelShape::set_projection_view_mat(glm::mat4* mat)
-{
-    pv_mat = mat;
-}
-
-void ModelShape::set_model_mat(glm::mat4 mat)
-{
-    model_mat = glm::mat4(mat);
 }

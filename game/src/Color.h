@@ -17,9 +17,19 @@ struct Color
     Color(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
         :r(r),g(g),b(b),a(a) {}
 
-    unsigned int toInt()
+    unsigned int toInt() const
     {
         return *((unsigned int*)this);
+    }
+
+    Color scale(float s)
+    {
+        return Color{
+            (unsigned char)(r * s), 
+            (unsigned char)(g * s), 
+            (unsigned char)(b * s), 
+            (unsigned char)(a * s), 
+        };
     }
 };
 

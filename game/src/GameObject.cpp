@@ -2,7 +2,7 @@
 
 #include "glm/gtc/matrix_transform.hpp"
 
-GameObject::GameObject(Point2D pos, ModelShape* shape, float radius)
+GameObject::GameObject(Point2D pos, Shape3D* shape, float radius)
     :position(pos), shape(shape), radius(radius)
 {}
 
@@ -19,6 +19,7 @@ void GameObject::update_model_mat()
 
 void GameObject::render(SDL_Renderer* renderer)
 {
+    update_model_mat();
     shape->render(renderer);
 }
 

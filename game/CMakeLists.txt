@@ -28,14 +28,19 @@ add_executable(game
     src/Point2D.cpp
     src/Shape.cpp
     src/Rectangle.cpp
+    src/FilledRectangle.cpp
     src/Triangle.cpp
     src/Circle.cpp
+    src/Shape3D.cpp
     src/ModelShape.cpp
+    src/ParticleShape.cpp
     src/GameObject.cpp
     src/SpaceShip.cpp
     src/Asteroid.cpp
     src/LazerShot.cpp
+    src/ParticleSystem.cpp
     src/Game.cpp
+    src/autogen/generated_models.cpp
 )
 
 

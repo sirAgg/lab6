@@ -3,7 +3,7 @@
 
 #include "../Model.h"
 
-glm::vec3 space_ship_model_points[] = {
+static glm::vec3 space_ship_model_points[] = {
     {0.000000, 0.000000, 1.368844},
     {1.000000, 1.000000, -1.224207},
     {-1.000000, 1.000000, -1.224207},
@@ -14,7 +14,7 @@ glm::vec3 space_ship_model_points[] = {
     {-0.469595, 0.000000, -0.611818},
     {0.000000, -0.469595, -0.611818},
 };
-Line space_ship_model_lines[] = {
+static Line space_ship_model_lines[] = {
     {5, 3},
     {6, 1},
     {7, 2},
@@ -28,6 +28,6 @@ Line space_ship_model_lines[] = {
     {4, 0},
     {2, 0},
 };
-Model space_ship_model = { (glm::vec3*)&space_ship_model_points, 9, (Line*)&space_ship_model_lines, 12};
+Model GeneratedModels::space_ship_model = { (glm::vec3*)&space_ship_model_points, 9, (Line*)&space_ship_model_lines, 12};
 
 #endif

@@ -6,7 +6,7 @@
 class Asteroid : public GameObject
 {
 public:
-    Asteroid( Point2D pos, ModelShape* shape, glm::vec3 rotation_axis, float speed, float rotation_speed, float stop_position, float fade_distance);
+    Asteroid( Point2D pos, glm::vec3 rotation_axis, float speed, float rotation_speed, float stop_position, float fade_distance);
 
     bool update() override;
     void update_model_mat() override;
@@ -23,6 +23,8 @@ private:
     float fade_distance;
 
     int health;
+
+    Color color;
 };
 
 #endif // __ASTEROID_H_

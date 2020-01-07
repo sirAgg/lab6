@@ -15,7 +15,7 @@ public:
 	int get_height();
 	void set_width(int w);
 	void set_height(int h);
-private:
+protected:
     
     int width, height;
 
