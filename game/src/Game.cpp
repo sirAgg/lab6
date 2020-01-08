@@ -88,8 +88,6 @@ Game::~Game()
 
     SDL_DestroyWindow(window);
     SDL_Quit();
-
-    printf("You reached a score of: %d\n", score);
 }
 
 void Game::run()
@@ -131,7 +129,10 @@ bool Game::update()
     //
 	if (!game_over)
 		if (!space_ship->update())
+		{
 			game_over = true;
+			printf("You reached a score of: %d\n", score);
+		}
 
     update_game_objects((std::vector<GameObject*>*)&asteroids);
     update_game_objects((std::vector<GameObject*>*)&lazer_shots);
@@ -148,8 +149,8 @@ bool Game::update()
         object->render(renderer);
     for(auto lazer: lazer_shots)
         lazer->render(renderer);
-    for(auto asteroid: asteroids)
-        asteroid->render(renderer);
+    for(auto it = asteroids.rbegin(); it != asteroids.rend(); ++it)
+        (*it)->render(renderer);
 
     space_ship->render(renderer);
 
