@@ -41,7 +41,7 @@ bool SpaceShip::update()
 
     if(input & ACTION_UP && shooting_cooldown <= 0)
     {
-        Game::get_game()->spawn_lazer_shot(position);
+        Game::get_game()->spawn_lazer_shot(Point2D(position.get_x(), position.get_y()-1.7));
         shooting_cooldown = SHOOTING_COOLDOWN_MAX_TIME;
     }
     else if(shooting_cooldown > 0)

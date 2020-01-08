@@ -123,7 +123,6 @@ bool Game::update()
     else
         asteroid_spawn_timer--;
 
-
     //
     // Update All GameObjects
     //
