@@ -25,7 +25,7 @@ bool Asteroid::update()
     if(health <= 0)
     {
         Game::get_game()->increase_score(ASTEROID_KILL_SCORE);
-        Game::get_game()->spawn_particles(position);
+        Game::get_game()->spawn_particles(position, rotation_axis, rotation);
         return false;
     }
 

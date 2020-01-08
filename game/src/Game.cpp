@@ -23,6 +23,7 @@ Game::Game(int window_width, int window_height)
     :window_width(window_width), window_height(window_height)
 {
     current_game = this;
+	game_over = false;
     srand(time(0));
     //
     // Initialize SDL
@@ -118,7 +119,8 @@ bool Game::update()
     {
         spawn_asteroid();
         asteroid_spawn_timer = asteroid_spawn_delay;
-        asteroid_spawn_delay--;
+		if(asteroid_spawn_delay > 20)
+			asteroid_spawn_delay = 20;
     }
     else
         asteroid_spawn_timer--;
@@ -127,7 +129,10 @@ bool Game::update()
     //
     // Update All GameObjects
     //
-    space_ship->update();
+	if (!game_over)
+		if (!space_ship->update())
+			game_over = true;
+
     update_game_objects((std::vector<GameObject*>*)&asteroids);
     update_game_objects((std::vector<GameObject*>*)&lazer_shots);
     update_game_objects(&other_game_objects);
@@ -157,14 +162,15 @@ bool Game::update()
 
 void Game::update_game_objects(std::vector<GameObject*>* objects)
 {
-    for(auto it = objects->begin(); it != objects->end(); it++)
+    for(auto it = objects->begin(); it != objects->end();)
     {
         if(!(*it)->update())
         {
             delete (*it);
             it = objects->erase(it);
-            it--;
+			continue;
         }
+		it++;
     }
 }
 
@@ -227,8 +233,11 @@ void Game::spawn_asteroid()
     Point2D pos;
     pos.set_x((float)rand()/(float)RAND_MAX*GAME_FIELD_WIDTH*2.0f - GAME_FIELD_WIDTH);
     pos.set_y(-100.0f);
+	float r1 = (float)rand() / (float)RAND_MAX*2.0f - 1.0f;
+	float r2 = (float)rand() / (float)RAND_MAX*2.0f - 1.0f;
+	float r3 = (float)rand() / (float)RAND_MAX*2.0f - 1.0f;
 
-    asteroids.push_back(new Asteroid(pos, glm::vec3(1.0f,1.0f,1.0f), asteroid_speed, 0.1f, camera_pos.y+2.0f, 7.0f));
+    asteroids.push_back(new Asteroid(pos, glm::vec3(r1,r2,r3), asteroid_speed, 0.1f, camera_pos.y+2.0f, 7.0f));
 
     //asteroid_speed += 0.01f;
 }
@@ -239,9 +248,9 @@ void Game::spawn_lazer_shot(Point2D pos)
     lazer_shots.push_back(new LazerShot(pos, lazer_shot_m, -0.4, -100.0f));
 }
 
-void Game::spawn_particles(Point2D pos)
+void Game::spawn_particles(Point2D pos, glm::vec3 rotation_axis, float rotation)
 {
-    ParticleSystem* p = new ParticleSystem(pos, 0.0f, 0xFFFFFFFF, ParticleSystem::circle_particles, 8, 180, 90);
+    ParticleSystem* p = new ParticleSystem(pos, 0.0f, 0xFFFFFFFF, ParticleSystem::circle_particles, 8, rotation_axis, rotation,  180, 90);
     //p->set_time(1.0f);
     other_game_objects.push_back(p);
 }
@@ -255,6 +264,7 @@ const std::vector<Asteroid*>* Game::get_asteroids()
 {
     return &asteroids;
 }
+#define _USE_MATH_DEFINES
 
 const InputActions Game::get_inputs() const
 {

@@ -46,13 +46,14 @@ add_executable(game
 
 
 SET(CMAKE_SOURCE_DIR "${CMAKE_SOURCE_DIR}/game")
+SET(CMAKE_BINARY_DIR "${CMAKE_BINARY_DIR}/game")
 message(${CMAKE_SOURCE_DIR})
 
 if(WIN32)
     include_directories(BEFORE "deps/SDL2/win_include/")
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS YES)
     configure_file("deps/SDL2/SDL2.dll" "${CMAKE_BINARY_DIR}/SDL2.dll" COPYONLY)
-    target_link_libraries(game glm ${CMAKE_SOURCE_DIR}/deps/SDL2.lib ${CMAKE_SOURCE_DIR}/deps/SDL2main.lib )
+    target_link_libraries(game glm ${CMAKE_SOURCE_DIR}/deps/SDL2/SDL2.lib ${CMAKE_SOURCE_DIR}/deps/SDL2/SDL2main.lib )
 else()
     set(CMAKE_CXX_FLAGS "-g")
     find_library(SDL2 SDL2-2.0 "${CMAKE_SOURCE_DIR}/deps/SDL2" NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)

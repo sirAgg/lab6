@@ -1,6 +1,8 @@
 #include "SpaceShip.h"
 
 #include <stdio.h>
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 #include "glm/gtc/matrix_transform.hpp"
 #include "Game.h"
@@ -15,6 +17,7 @@ const int INVINCIBILITY_TIME_MAX = 90;
 SpaceShip::SpaceShip(Point2D pos, int lives)
     :GameObject(pos, new ModelShape(Point2D(0,0),0xFFFF00FF,&GeneratedModels::space_ship_model), SPACE_SHIP_SIZE), lives(lives)
 {
+	color = 0xFFFF00FF;
     target_x = pos.get_x();
 }
 
@@ -63,12 +66,23 @@ bool SpaceShip::update()
             {
                 invincibility_time = INVINCIBILITY_TIME_MAX;
                 lives--;
-                printf("lives: %d\n", lives);
+				if (lives <= 0)
+				{
+					Game::get_game()->spawn_particles(position, glm::vec3(1.0f, 0.0f, 0.0f), M_PI_2);
+					shape->set_color(0);
+					return false;
+				}
             }
         }
     }
-    else
+	else
+	{
+		if (invincibility_time & 16)
+			shape->set_color(0);
+		else
+			shape->set_color(color);
         invincibility_time--;
+	}
     
     return true;
 }

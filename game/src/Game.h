@@ -29,7 +29,7 @@ public:
     void spawn(GameObject* object);
     void spawn_asteroid();
     void spawn_lazer_shot(Point2D pos);
-    void spawn_particles(Point2D pos);
+    void spawn_particles(Point2D pos, glm::vec3 rotation_axis, float rotation);
 
     void increase_score(int increase);
 
@@ -65,8 +65,8 @@ private:
     int asteroid_spawn_timer = 0;
     int asteroid_spawn_delay = ASTEROID_SPAWN_TIMER_START;
     int score = 0;
+	bool game_over;
 
-    int lives;
     std::vector<Shape*> lives_counter_ui;
 };
 

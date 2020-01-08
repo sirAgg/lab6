@@ -21,6 +21,7 @@ private:
     int shooting_cooldown = 0;
     int invincibility_time; 
     int lives;
+	Color color;
 };
 
 #endif // __SPACESHIP_H_
