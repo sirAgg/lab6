@@ -12,10 +12,6 @@
 #include "LazerShot.h"
 #include "InputActions.h"
 
-const int ASTEROID_SPAWN_TIMER_START = 120;
-const float GAME_FIELD_WIDTH = 7.0f;
-const int MAX_LIVES = 5;
-
 class Game
 {
 public:
@@ -63,7 +59,7 @@ private:
 
     float asteroid_speed = 0.2f;
     int asteroid_spawn_timer = 0;
-    int asteroid_spawn_delay = ASTEROID_SPAWN_TIMER_START;
+    int asteroid_spawn_time = 0;
     int score = 0;
 	bool game_over;
 

@@ -19,7 +19,7 @@ private:
 
     float target_x;
     int shooting_cooldown = 0;
-    int invincibility_time; 
+    int invincibility_time = 0;
     int lives;
 	Color color;
 };

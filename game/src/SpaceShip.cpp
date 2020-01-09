@@ -7,15 +7,11 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "Game.h"
 #include "autogen/generated_models.h"
+#include "GameConstants.h"
 
-const float MOVE_FACTOR = 0.1f;
-const float TARGET_MOVE_SPEED = 0.15f;
-const float SPACE_SHIP_SIZE = 0.8f;
-const int SHOOTING_COOLDOWN_MAX_TIME = 15;
-const int INVINCIBILITY_TIME_MAX = 90;
 
 SpaceShip::SpaceShip(Point2D pos, int lives)
-    :GameObject(pos, new ModelShape(Point2D(0,0),0xFFFF00FF,&GeneratedModels::space_ship_model), SPACE_SHIP_SIZE), lives(lives)
+    :GameObject(pos, new ModelShape(Point2D(0,0),0xFFFF00FF,&GeneratedModels::space_ship_model), SPACESHIP_SIZE), lives(lives)
 {
 	color = 0xFFFF00FF;
     target_x = pos.get_x();
@@ -26,7 +22,7 @@ bool SpaceShip::update()
     InputActions input = Game::get_game()->get_inputs();
     if(input & ACTION_LEFT)
     {
-        target_x -= TARGET_MOVE_SPEED;
+        target_x -= SPACESHIP_MOVE_SPEED;
 
         if(target_x < -GAME_FIELD_WIDTH)
             target_x = -GAME_FIELD_WIDTH;
@@ -34,7 +30,7 @@ bool SpaceShip::update()
 
     if(input & ACTION_RIGHT)
     {
-        target_x += TARGET_MOVE_SPEED;
+        target_x += SPACESHIP_MOVE_SPEED;
         if(target_x > GAME_FIELD_WIDTH)
             target_x = GAME_FIELD_WIDTH;
     }
@@ -42,7 +38,7 @@ bool SpaceShip::update()
     if(input & ACTION_UP && shooting_cooldown <= 0)
     {
         Game::get_game()->spawn_lazer_shot(Point2D(position.get_x(), position.get_y()-1.7));
-        shooting_cooldown = SHOOTING_COOLDOWN_MAX_TIME;
+        shooting_cooldown = SPACESHIP_SHOOTING_COOLDOWN_TIME_MAX;
     }
     else if(shooting_cooldown > 0)
         shooting_cooldown--;
@@ -51,7 +47,7 @@ bool SpaceShip::update()
     float move_dist = target_x - position.get_x();
     if ( abs(move_dist) > 0.001f)
     {
-        position.set_x(position.get_x() + move_dist * MOVE_FACTOR);
+        position.set_x(position.get_x() + move_dist * SPACESHIP_RESPONSIVENESS);
     }
 
     //
@@ -64,7 +60,7 @@ bool SpaceShip::update()
         {
             if(is_colliding_with(asteroid))
             {
-                invincibility_time = INVINCIBILITY_TIME_MAX;
+                invincibility_time = SPACESHIP_INVINCIBILITY_TIME_MAX;
                 lives--;
 				if (lives <= 0)
 				{

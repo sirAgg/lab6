@@ -9,9 +9,10 @@
 
 const float ASTEROID_SIZE = 0.9f;;
 const int ASTEROID_KILL_SCORE = 5;
+const Color ASTEROID_COLOR = 0xFFFFFFFF;
 
 Asteroid::Asteroid( Point2D pos, glm::vec3 rotation_axis, float speed, float rotation_speed, float stop_position, float fade_distance)
-    :GameObject(pos, new ModelShape(Point2D(0,0),0xFFFFFFFF,&GeneratedModels::asteroid_1_model), ASTEROID_SIZE), rotation_axis(rotation_axis), speed(speed), rotation_speed(rotation_speed), stop_position(stop_position), fade_distance(fade_distance)
+    :GameObject(pos, new ModelShape(Point2D(0,0), ASTEROID_COLOR,&GeneratedModels::asteroid_1_model), ASTEROID_SIZE), rotation_axis(rotation_axis), speed(speed), rotation_speed(rotation_speed), stop_position(stop_position), fade_distance(fade_distance)
 {
     rotation = 0.0f;
     start_position = position.get_y();
@@ -24,8 +25,8 @@ bool Asteroid::update()
 {
     if(health <= 0)
     {
-        Game::get_game()->increase_score(ASTEROID_KILL_SCORE);
         Game::get_game()->spawn_particles(position, rotation_axis, rotation);
+        when_killed();
         return false;
     }
 
@@ -51,6 +52,11 @@ bool Asteroid::update()
         shape->set_color(c);
     }
     return true;
+}
+
+void Asteroid::when_killed()
+{
+    Game::get_game()->increase_score(ASTEROID_KILL_SCORE);
 }
 
 void Asteroid::update_model_mat()

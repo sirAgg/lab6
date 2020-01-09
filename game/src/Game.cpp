@@ -10,6 +10,7 @@
 #include "FilledRectangle.h"
 #include "ParticleSystem.h"
 #include "autogen/generated_models.h"
+#include "GameConstants.h"
 
 Game* Game::current_game;
 
@@ -23,15 +24,20 @@ Game::Game(int window_width, int window_height)
     :window_width(window_width), window_height(window_height)
 {
     current_game = this;
-	game_over = false;
     srand(time(0));
+
+
+	game_over = false;
+    asteroid_spawn_time = ASTEROID_SPAWN_TIMER_START;
+
+
     //
     // Initialize SDL
     //
     {
         SDL_Init(SDL_INIT_EVERYTHING);
         window = SDL_CreateWindow(
-                "Hello there",
+                "Asteroid Game",
                 SDL_WINDOWPOS_CENTERED,
                 SDL_WINDOWPOS_CENTERED,
                 window_width,window_height,
@@ -116,9 +122,11 @@ bool Game::update()
     if(asteroid_spawn_timer <= 0)
     {
         spawn_asteroid();
-        asteroid_spawn_timer = asteroid_spawn_delay;
-		if(asteroid_spawn_delay > 20)
-			asteroid_spawn_delay = 20;
+        asteroid_spawn_timer = asteroid_spawn_time;
+		if(asteroid_spawn_time > 20)
+			asteroid_spawn_time--;
+        else
+            asteroid_speed += 0.01f;
     }
     else
         asteroid_spawn_timer--;
@@ -232,7 +240,7 @@ void Game::spawn_asteroid()
 {
     Point2D pos;
     pos.set_x((float)rand()/(float)RAND_MAX*GAME_FIELD_WIDTH*2.0f - GAME_FIELD_WIDTH);
-    pos.set_y(-100.0f);
+    pos.set_y(-GAME_FIELD_LENGTH);
 	float r1 = (float)rand() / (float)RAND_MAX*2.0f - 1.0f;
 	float r2 = (float)rand() / (float)RAND_MAX*2.0f - 1.0f;
 	float r3 = (float)rand() / (float)RAND_MAX*2.0f - 1.0f;
@@ -245,12 +253,12 @@ void Game::spawn_asteroid()
 void Game::spawn_lazer_shot(Point2D pos)
 {
     ModelShape* lazer_shot_m = new ModelShape(Point2D(), 0xFF5555FF, &LazerShot::lazer_shot_model);
-    lazer_shots.push_back(new LazerShot(pos, lazer_shot_m, -0.4, -100.0f));
+    lazer_shots.push_back(new LazerShot(pos, lazer_shot_m, -0.4, -GAME_FIELD_LENGTH));
 }
 
 void Game::spawn_particles(Point2D pos, glm::vec3 rotation_axis, float rotation)
 {
-    ParticleSystem* p = new ParticleSystem(pos, 0.0f, 0xFFFFFFFF, ParticleSystem::circle_particles, 8, rotation_axis, rotation,  180, 90);
+    ParticleSystem* p = new ParticleSystem(pos, 0.0f, 0xFFFFFFFF, &GeneratedModels::asteroid_1_model, rotation_axis, rotation,  120, 60);
     //p->set_time(1.0f);
     other_game_objects.push_back(p);
 }

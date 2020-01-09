@@ -9,18 +9,15 @@ public:
     Asteroid( Point2D pos, glm::vec3 rotation_axis, float speed, float rotation_speed, float stop_position, float fade_distance);
 
     bool update() override;
+    virtual void when_killed();
     void update_model_mat() override;
     void take_damage();
 
-private:
+protected:
     glm::vec3 rotation_axis;
     float rotation;
     float rotation_speed;
     float speed;
-
-    float start_position;
-    float stop_position;
-    float fade_distance;
 
     int health;
 

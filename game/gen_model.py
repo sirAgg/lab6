@@ -35,6 +35,8 @@ def gen_file(directory, out_dir, filename):
                     c_file.write( '    {' + str(int(words[1])-1) + ', ' + str(int(words[2])-1) + '},\n')
                     n_lines += 1
 
+            if n_lines <= 0:
+                c_file.write('};\nstatic Line ' + obj_name +'_lines[] = {{0,0}\n')
             c_file.write( '};\n')
             c_file.write("Model GeneratedModels::" + obj_name + " = { (glm::vec3*)&" + obj_name + "_points, " + str(n_points) + ", (Line*)&" + obj_name + "_lines, " + str(n_lines) + "};\n" + content_postfix)
 

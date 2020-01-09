@@ -1,30 +1,18 @@
 #include "ParticleSystem.h"
 
 #include <stdio.h>
-#define _USE_MATH_DEFINES
-#include <math.h>
 #include "glm/gtc/matrix_transform.hpp"
 
 #include "ParticleShape.h"
-
-
-glm::vec3 ParticleSystem::circle_particles[] = {
-    {1.0f,0.0f,0.0f},
-    {-1.0f,0.0f,0.0f},
-    {0.0f,0.0f,1.0f},
-    {0.0f,0.0f,-1.0f},
-    {cos(M_PI_4),0.0f,sin(M_PI_4)},
-    {-cos(M_PI_4),0.0f,sin(M_PI_4)},
-    {-cos(M_PI_4),0.0f,-sin(M_PI_4)},
-    {cos(M_PI_4),0.0f,-sin(M_PI_4)},
-};
-
 
 ParticleSystem::ParticleSystem(Point2D pos, float radius, Color color, glm::vec3* velocities, int n_particles, glm::vec3 rotation_axis, float rotation, int life_length, int fade_out_time)
     :GameObject(pos, new ParticleShape(Point2D(0,0),color,velocities, n_particles),radius), rotation_axis(rotation_axis), rotation(rotation), life_length(life_length), fade_out_time(fade_out_time), color(color)
 {
 
 }
+ParticleSystem::ParticleSystem(Point2D pos, float radius, Color color, Model* model, glm::vec3 rotation_axis, float rotation, int life_length, int fade_out_time)
+    :ParticleSystem(pos, radius, color, model->points, model->n_points, rotation_axis, rotation, life_length, fade_out_time)
+{}
 
 bool ParticleSystem::update()
 {
