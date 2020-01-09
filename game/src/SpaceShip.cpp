@@ -19,6 +19,9 @@ SpaceShip::SpaceShip(Point2D pos, int lives)
 
 bool SpaceShip::update()
 {
+    // 
+    // React to inputs
+    //
     InputActions input = Game::get_game()->get_inputs();
     if(input & ACTION_LEFT)
     {
@@ -35,15 +38,18 @@ bool SpaceShip::update()
             target_x = GAME_FIELD_WIDTH;
     }
 
-    if(input & ACTION_UP && shooting_cooldown <= 0)
+    if((input & ACTION_SHOOT) && shooting_cooldown <= 0)
     {
-        Game::get_game()->spawn_lazer_shot(Point2D(position.get_x(), position.get_y()-1.7));
+        Game::get_game()->spawn_lazer_shot(Point2D(position.get_x(), position.get_y()-1.7f));
         shooting_cooldown = SPACESHIP_SHOOTING_COOLDOWN_TIME_MAX;
     }
     else if(shooting_cooldown > 0)
         shooting_cooldown--;
 
 
+    //
+    // Move to target x
+    //
     float move_dist = target_x - position.get_x();
     if ( abs(move_dist) > 0.001f)
     {
@@ -53,17 +59,18 @@ bool SpaceShip::update()
     //
     // Asteroid collision
     //
-   
     if( invincibility_time <= 0)
     {
         for(auto asteroid: *Game::get_game()->get_asteroids())
         {
             if(is_colliding_with(asteroid))
             {
+                // spaceship is hit
                 invincibility_time = SPACESHIP_INVINCIBILITY_TIME_MAX;
                 lives--;
 				if (lives <= 0)
 				{
+                    // Spaceship is dead
 					Game::get_game()->spawn_particles(position, glm::vec3(1.0f, 0.0f, 0.0f), M_PI_2);
 					shape->set_color(0);
 					return false;
@@ -73,6 +80,7 @@ bool SpaceShip::update()
     }
 	else
 	{
+        // spaceship is invincible
 		if (invincibility_time & 16)
 			shape->set_color(0);
 		else
@@ -85,11 +93,21 @@ bool SpaceShip::update()
 
 void SpaceShip::update_model_mat()
 {
+    //
+    // Update model matrix for spaceship shape
+    //
+    
+    // position
     glm::mat4 m = glm::translate(glm::mat4(1.0f), glm::vec3(position.get_x(), position.get_y(), 0.0f));
-    m = glm::rotate(m, glm::radians(-90.0f), glm::vec3(1.0f,0.0f,0.0f));
+
+    // rotation
+    m = glm::rotate(m, glm::radians(-90.0f), glm::vec3(1.0f,0.0f,0.0f)); // rotate to correct orientation
     m = glm::rotate(m, 0.3f * (position.get_x() - target_x) , glm::vec3(0.0f,0.0f,1.0f));
     m = glm::rotate(m, 0.4f * (position.get_x() - target_x) , glm::vec3(0.0f,1.0f,0.0f));
+
+    // scale
     m = glm::scale(m, glm::vec3(1.0f,1.0f,-1.0f));
+
     shape->set_model_mat(m);
 }
 

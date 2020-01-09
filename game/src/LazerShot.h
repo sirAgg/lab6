@@ -9,7 +9,7 @@
 class LazerShot: public GameObject
 {
 public:
-    LazerShot(Point2D pos, ModelShape* shape, float speed, float stop_position);
+    LazerShot(Point2D pos, float speed);
 
     bool update(); 
     
@@ -17,7 +17,6 @@ public:
 
 private:
     float speed;
-    float stop_position;
 };
 
 #endif /* __LAZERSHOT_H_ */

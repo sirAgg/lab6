@@ -1,7 +1,7 @@
 #include "LazerShot.h"
 
 #include "Game.h"
-
+#include "GameConstants.h"
 
 //
 // Create Model for LazerShot
@@ -25,10 +25,9 @@ const Model LazerShot::lazer_shot_model = {
     1
 };
 
-const float LAZER_SHOT_SIZE = 0.2f;
 
-LazerShot::LazerShot(Point2D pos, ModelShape* shape, float speed, float stop_position):
-    GameObject(pos, shape, LAZER_SHOT_SIZE), speed(speed), stop_position(stop_position)
+LazerShot::LazerShot(Point2D pos, float speed)
+    :GameObject(pos, new ModelShape(Point2D(),LAZER_SHOT_COLOR,&lazer_shot_model), LAZER_SHOT_SIZE), speed(speed)
 {
     
 }
@@ -36,7 +35,7 @@ LazerShot::LazerShot(Point2D pos, ModelShape* shape, float speed, float stop_pos
 bool LazerShot::update()
 {
     position.set_y(position.get_y() + speed);
-    if(position.get_y() < stop_position)
+    if(position.get_y() < GAME_FIELD_FAR_EDGE)
         return false;
 
     //

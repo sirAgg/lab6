@@ -4,14 +4,15 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 #include "ParticleShape.h"
+#include "GameConstants.h"
 
-ParticleSystem::ParticleSystem(Point2D pos, float radius, Color color, glm::vec3* velocities, int n_particles, glm::vec3 rotation_axis, float rotation, int life_length, int fade_out_time)
-    :GameObject(pos, new ParticleShape(Point2D(0,0),color,velocities, n_particles),radius), rotation_axis(rotation_axis), rotation(rotation), life_length(life_length), fade_out_time(fade_out_time), color(color)
+ParticleSystem::ParticleSystem(Point2D pos, Color color, glm::vec3* velocities, int n_particles, glm::vec3 rotation_axis, float rotation, int life_length, int fade_out_time)
+    :GameObject(pos, new ParticleShape(Point2D(0,0),color,velocities, n_particles),0.0f), rotation_axis(rotation_axis), rotation(rotation), life_length(life_length), fade_out_time(fade_out_time), color(color)
 {
 
 }
-ParticleSystem::ParticleSystem(Point2D pos, float radius, Color color, Model* model, glm::vec3 rotation_axis, float rotation, int life_length, int fade_out_time)
-    :ParticleSystem(pos, radius, color, model->points, model->n_points, rotation_axis, rotation, life_length, fade_out_time)
+ParticleSystem::ParticleSystem(Point2D pos, Color color, Model* model, glm::vec3 rotation_axis, float rotation, int life_length, int fade_out_time)
+    :ParticleSystem(pos, color, model->points, model->n_points, rotation_axis, rotation, life_length, fade_out_time)
 {}
 
 bool ParticleSystem::update()
@@ -26,7 +27,7 @@ bool ParticleSystem::update()
         shape->set_color(c);
     }
 
-    ((ParticleShape*)shape)->set_time(life_time*0.08f);
+    ((ParticleShape*)shape)->set_time(life_time*PARTICLE_SYSTEM_SPEED);
 
     life_time++;
     return true;

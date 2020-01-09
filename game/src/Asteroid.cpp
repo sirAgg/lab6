@@ -5,58 +5,54 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 #include "Game.h"
+#include "GameConstants.h"
 #include "autogen/generated_models.h"
 
-const float ASTEROID_SIZE = 0.9f;;
-const int ASTEROID_KILL_SCORE = 5;
-const Color ASTEROID_COLOR = 0xFFFFFFFF;
-
 Asteroid::Asteroid( Point2D pos, glm::vec3 rotation_axis, float speed, float rotation_speed, float stop_position, float fade_distance)
-    :GameObject(pos, new ModelShape(Point2D(0,0), ASTEROID_COLOR,&GeneratedModels::asteroid_1_model), ASTEROID_SIZE), rotation_axis(rotation_axis), speed(speed), rotation_speed(rotation_speed), stop_position(stop_position), fade_distance(fade_distance)
+    :GameObject(pos, new ModelShape(Point2D(0,0), ASTEROID_COLOR,&GeneratedModels::asteroid_1_model), ASTEROID_SIZE), rotation_axis(rotation_axis), speed(speed), rotation_speed(rotation_speed)
 {
     rotation = 0.0f;
-    start_position = position.get_y();
     health = 4;
-
-    color = Color(0xFFFFFFFF);
+    color = ASTEROID_COLOR;
 }
 
 bool Asteroid::update()
 {
+    //
+    // Check healt
+    //
     if(health <= 0)
     {
+        // asteroid is dead
         Game::get_game()->spawn_particles(position, rotation_axis, rotation);
-        when_killed();
+        Game::get_game()->increase_score(ASTEROID_KILL_SCORE);
         return false;
     }
 
+    // update rotation and position
     rotation = rotation + rotation_speed;
     position.set_y(position.get_y() + speed );
 
-    if(position.get_y() > stop_position)
+    // The Asteroid is outside Game field
+    if(position.get_y() > GAME_FIELD_NEAR_EDGE)
         return false;
 
     // fade in effect
-    if(position.get_y() < start_position + fade_distance)
+    if(position.get_y() < ASTEROID_FADE_IN_AT)
     {
-        float t = (position.get_y() - start_position)/fade_distance;
+        float t = (position.get_y() - GAME_FIELD_FAR_EDGE)/(ASTEROID_FADE_IN_AT-GAME_FIELD_FAR_EDGE);
         Color c = color.scale(t);
         shape->set_color(c);
     }
 
     // fade out effect
-    if(position.get_y() > stop_position-fade_distance)
+    if(position.get_y() > ASTEROID_FADE_OUT_AT)
     {
-        float t = (stop_position - position.get_y())/fade_distance;
+        float t = (GAME_FIELD_NEAR_EDGE - position.get_y())/(GAME_FIELD_NEAR_EDGE-ASTEROID_FADE_OUT_AT);
         Color c = color.scale(t);
         shape->set_color(c);
     }
     return true;
-}
-
-void Asteroid::when_killed()
-{
-    Game::get_game()->increase_score(ASTEROID_KILL_SCORE);
 }
 
 void Asteroid::update_model_mat()

@@ -10,6 +10,7 @@
 #include "SpaceShip.h"
 #include "Asteroid.h"
 #include "LazerShot.h"
+#include "ParticleSystem.h"
 #include "InputActions.h"
 
 class Game
@@ -22,7 +23,6 @@ public:
 
     void run();
 
-    void spawn(GameObject* object);
     void spawn_asteroid();
     void spawn_lazer_shot(Point2D pos);
     void spawn_particles(Point2D pos, glm::vec3 rotation_axis, float rotation);
@@ -53,9 +53,9 @@ private:
     SpaceShip* space_ship;
     std::vector<Asteroid*> asteroids;
     std::vector<LazerShot*> lazer_shots;
-    std::vector<GameObject*> other_game_objects;
+    std::vector<ParticleSystem*> particles;
     
-    InputActions inputs = 0;
+    InputActions inputs = 0; // stores state of used keyboard keys
 
     float asteroid_speed = 0.2f;
     int asteroid_spawn_timer = 0;

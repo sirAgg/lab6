@@ -23,7 +23,6 @@ public:
 protected:
     Color color;
     Point2D position;
-    bool alive = true;
 };
 
 #endif /* SHAPE_H */
