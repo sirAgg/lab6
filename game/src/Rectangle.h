@@ -18,7 +18,6 @@ public:
 protected:
     
     int width, height;
-
 };
 
 #endif /* RECTANGLE_H */

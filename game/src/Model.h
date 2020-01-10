@@ -8,6 +8,10 @@ struct Line
     int a,b;
 };
 
+//
+// Just a container of data 
+// for static models
+//
 struct Model
 {
     glm::vec3* points;

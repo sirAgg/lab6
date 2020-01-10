@@ -6,6 +6,11 @@ FilledRectangle::FilledRectangle(Point2D pos, Color color, int width, int height
 
 void FilledRectangle::render(SDL_Renderer* renderer)
 {
+    //
+    // renders a filled rectangle around the position
+    // the position is the centerpoint of the rectangle
+    // not the top left corner
+    //
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
     int hw = width/2;
     int hh = height/2;

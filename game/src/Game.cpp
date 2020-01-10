@@ -23,7 +23,8 @@ Game* Game::get_game()
 Game::Game(int window_width, int window_height)
     :window_width(window_width), window_height(window_height)
 {
-    current_game = this; // set current pointer to current game instance
+    // set current pointer to current game instance
+    current_game = this;
 
     //
     // Initialize SDL
@@ -43,7 +44,7 @@ Game::Game(int window_width, int window_height)
     //
     // Create projection and view matrices
     //
-    camera_pos = glm::vec3(0.0f,3.0f,7.0f);
+    glm::vec3 camera_pos = glm::vec3(0.0f,3.0f,7.0f);
     {
         // matrix for mapping homogeneous coordinates to screen-coordinates
         glm::mat4 post_trans = glm::mat4(1.0f);
@@ -65,18 +66,24 @@ Game::Game(int window_width, int window_height)
     //
     // initalize some fields
     //
-	game_over = false;
-    asteroid_spawn_time = ASTEROID_SPAWN_TIMER_START;
-    asteroid_spawn_timer = ASTEROID_SPAWN_TIMER_START;
-    srand(time(0));
-    space_ship = new SpaceShip(Point2D(0.0f,0.0f), MAX_LIVES);
-    for(int i = 0; i < MAX_LIVES; i++)
-        lives_counter_ui.push_back(new FilledRectangle(Point2D(15+30*i, 15),0xAA0000FF, 20,20));
+    {
+        game_over = false;
+        asteroid_spawn_time = ASTEROID_SPAWN_TIMER_START;
+        asteroid_spawn_timer = 0;
+        asteroid_speed = ASTEROID_START_SPEED;
+        srand(time(0));
+        space_ship = new SpaceShip(Point2D(0.0f,0.0f), MAX_LIVES);
+
+        // initialize lives counter 
+        for(int i = 0; i < MAX_LIVES; i++)
+            lives_counter_ui.push_back(new FilledRectangle(Point2D(15+30*i, 15),0xAA0000FF, 20,20));
+    }
 }
 
 Game::~Game()
 {
     // free everything
+    delete space_ship; 
     for(auto asteroid : asteroids )
         delete asteroid;
 
@@ -178,6 +185,8 @@ void Game::update_game_objects(std::vector<GameObject*>* objects)
 {
     for(auto it = objects->begin(); it != objects->end();)
     {
+        // if an objects update function returns false it's dead 
+        // and needs to be removed
         if(!(*it)->update())
         {
             delete (*it);
@@ -259,7 +268,7 @@ void Game::spawn_asteroid()
 	rotation_axis.y = (float)rand() / (float)RAND_MAX*2.0f - 1.0f;
 	rotation_axis.z = (float)rand() / (float)RAND_MAX*2.0f - 1.0f;
 
-    asteroids.push_back(new Asteroid(pos, rotation_axis, asteroid_speed, 0.1f, camera_pos.y+2.0f, 7.0f));
+    asteroids.push_back(new Asteroid(pos, rotation_axis, asteroid_speed));
 }
 
 void Game::spawn_lazer_shot(Point2D pos)
@@ -304,4 +313,3 @@ const glm::mat4* Game::get_pv_mat() const
 {
     return &pv_mat;
 }
-

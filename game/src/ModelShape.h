@@ -4,6 +4,9 @@
 #include "Shape3D.h"
 #include "Model.h"
 
+//
+// Renders a Model as a 3d wireframe
+//
 class ModelShape : public Shape3D
 {
 public:

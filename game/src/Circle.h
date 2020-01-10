@@ -13,6 +13,7 @@ public:
 
 	int get_radius();
 	void set_radius(int r);
+
 private:
     int radius;
 };

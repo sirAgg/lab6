@@ -3,8 +3,8 @@
 #include "../Model.h"
 class GeneratedModels {
 public:
-static Model space_ship_model;
 static Model asteroid_1_model;
 static Model ico_particle_field_model;
+static Model space_ship_model;
 };
 #endif

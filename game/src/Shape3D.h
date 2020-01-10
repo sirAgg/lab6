@@ -5,6 +5,13 @@
 
 #include "Shape.h"
 
+//
+// A shape rendered as a 3D wireframe
+// the position from Shape it's not related to the position in 3d space 
+// but is instead used to offset the rendered 3D wireframe.
+// The set_model_mat function should be used to set the shapes 
+// position (and rotation, and scale ...) in 3d space  
+//
 class Shape3D : public Shape
 {
 public:

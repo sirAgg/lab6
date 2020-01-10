@@ -29,40 +29,52 @@ public:
 
     void increase_score(int increase);
 
+    // getters
     const std::vector<Asteroid*>* get_asteroids();
     const InputActions get_inputs() const; 
     const glm::mat4* get_pv_mat() const;
 
 private:
-
+    // functions only used by the game object itself
     bool update();
     void update_game_objects(std::vector<GameObject*>* objects);
     bool process_events();
     void render_ui();
 
+    // reference to the current game so that 
+    // other parts of the game can have access to the game object
     static Game* current_game;
 
+    // SDL related data
     int window_width, window_height;
     SDL_Window* window;
     SDL_Renderer* renderer;
 
-    glm::mat4 pv_mat;  // projection view matrix
-    glm::vec3 camera_pos;
+    // projection view matrix
+    glm::mat4 pv_mat;
 
     // GameObjects
+    //
+    // I separated all types of gameobjects 
+    // so I can control n which order they are rendered
+    //
     SpaceShip* space_ship;
     std::vector<Asteroid*> asteroids;
     std::vector<LazerShot*> lazer_shots;
     std::vector<ParticleSystem*> particles;
-    
-    InputActions inputs = 0; // stores state of used keyboard keys
 
-    float asteroid_speed = 0.2f;
-    int asteroid_spawn_timer = 0;
-    int asteroid_spawn_time = 0;
+    // state of keyboard keys used in the game
+    InputActions inputs = 0;
+
+    // variables for spawning asteroids
+    float asteroid_speed;
+    int asteroid_spawn_timer;
+    int asteroid_spawn_time;
+
     int score = 0;
 	bool game_over;
 
+    // shapes for displaying lifes
     std::vector<Shape*> lives_counter_ui;
 };
 

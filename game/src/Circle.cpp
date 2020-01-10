@@ -17,7 +17,11 @@ void Circle::render(SDL_Renderer* renderer)
     float angle2 = 0.0f;
     for (int i = 0; i < CIRCLE_RESOLUTION; ++i) {
         angle1 += M_PI*2.0f/(float)CIRCLE_RESOLUTION;
-        SDL_RenderDrawLine(renderer, position.get_x()+radius*cos(angle2), position.get_y()+radius*sin(angle2), position.get_x()+radius*cos(angle1), position.get_y()+radius*sin(angle1));
+        SDL_RenderDrawLine(renderer,
+                position.get_x()+radius*cos(angle2),
+                position.get_y()+radius*sin(angle2),
+                position.get_x()+radius*cos(angle1),
+                position.get_y()+radius*sin(angle1));
         angle2 = angle1;
     }
 }

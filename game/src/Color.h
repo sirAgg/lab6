@@ -1,6 +1,9 @@
 #ifndef __COLOR_H_
 #define __COLOR_H_
 
+//
+// Simple struct for contaning rgba color
+//
 struct Color
 {
     unsigned char a,b,g,r;
@@ -24,6 +27,7 @@ struct Color
 
     Color scale(float s)
     {
+        // scale color with factor
         return Color{
             (unsigned char)(r * s), 
             (unsigned char)(g * s), 

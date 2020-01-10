@@ -6,7 +6,7 @@
 class Asteroid : public GameObject
 {
 public:
-    Asteroid( Point2D pos, glm::vec3 rotation_axis, float speed, float rotation_speed, float stop_position, float fade_distance);
+    Asteroid( Point2D pos, glm::vec3 rotation_axis, float speed);
 
     bool update() override;
     void update_model_mat() override;
@@ -16,9 +16,8 @@ protected:
     int health;
     float speed;
 
-    float rotation_speed;
-    float rotation;
-    glm::vec3 rotation_axis;
+    float rotation; 
+    glm::vec3 rotation_axis; // axis to rotate around
 
     Color color;
 };

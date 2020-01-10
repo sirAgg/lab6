@@ -14,9 +14,9 @@ public:
 	void update_model_mat() override;
 
 private:
-    int life_time = 0;
-    int life_length; 
-    int fade_out_time;
+    int life_time = 0; // how long the particlesystem has been alive
+    int life_length;   // when the particlesystem should die
+    int fade_out_time; // when the particlesystem shoud start to fade out
 
 	glm::vec3 rotation_axis;
 	float rotation;

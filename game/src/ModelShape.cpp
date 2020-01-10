@@ -10,10 +10,13 @@ ModelShape::ModelShape(Point2D pos, Color color, const Model* model)
 
 void ModelShape::render(SDL_Renderer* renderer)
 {
+    // get projection-view matrix and combine it with the model matrix
     glm::mat4 entire_trans_mat = *Game::get_game()->get_pv_mat() * model_mat;
 
-
     SDL_Point* points = new SDL_Point[model->n_points];
+
+    // apply the entire transformation matrix to each 
+    // point to get the point's screen-coordinates
     for (int i = 0; i < model->n_points; i++)
     {
         glm::vec4 pos = entire_trans_mat * glm::vec4( model->points[i], 1.0f );
@@ -22,6 +25,8 @@ void ModelShape::render(SDL_Renderer* renderer)
     }
 
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+
+    // draw lines between the points
     for(int i = 0; i < model->n_lines; i++)
     {
         SDL_Point& p1 = points[model->lines[i].a];

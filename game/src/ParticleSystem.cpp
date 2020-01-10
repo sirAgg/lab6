@@ -17,9 +17,11 @@ ParticleSystem::ParticleSystem(Point2D pos, Color color, Model* model, glm::vec3
 
 bool ParticleSystem::update()
 {
+    // Should the particle system be alive
     if( life_time > life_length )
         return false;
 
+    // fade out effect
     else if( life_time > fade_out_time )
     {
         float t = (float)(life_length - life_time)/(float)(life_length-fade_out_time);
@@ -27,14 +29,19 @@ bool ParticleSystem::update()
         shape->set_color(c);
     }
 
+    // update ParticleShape's time
     ((ParticleShape*)shape)->set_time(life_time*PARTICLE_SYSTEM_SPEED);
 
+    // increase life time
     life_time++;
     return true;
 }
 
 void ParticleSystem::update_model_mat()
 {
+    //
+    // Update model matrix for ParticleShape
+    //
     glm::mat4 m = glm::mat4(1.0f);
     m = glm::translate(m, glm::vec3(position.get_x(), position.get_y(), 0.0f));
     m = glm::rotate(m, rotation, rotation_axis);

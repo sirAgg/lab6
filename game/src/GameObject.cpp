@@ -13,12 +13,13 @@ GameObject::~GameObject()
 
 void GameObject::update_model_mat()
 {
-    // updates shapes model matrix taking only position into account
+    // updates shape's model matrix taking only position into account
     shape->set_model_mat(glm::translate(glm::mat4(1.0f), glm::vec3(position.get_x(), position.get_y(), 0.0f)));
 }
 
 void GameObject::render(SDL_Renderer* renderer)
 {
+    // update the model mat before rendering
     update_model_mat();
     shape->render(renderer);
 }
@@ -40,8 +41,9 @@ float GameObject::get_radius() const
 
 bool GameObject::is_colliding_with(const GameObject* other)
 {
+    // For collision every GameObject is regarded as a circle
     float x_diff = position.get_x() - other->get_position().get_x();
     float y_diff = position.get_y() - other->get_position().get_y();
-    float combined_radius = radius*radius + other->get_radius()*other->get_radius();
-    return  combined_radius > x_diff*x_diff + y_diff*y_diff;
+    float combined_radius_squared = radius*radius + other->get_radius()*other->get_radius();
+    return  combined_radius_squared > x_diff*x_diff + y_diff*y_diff;
 }

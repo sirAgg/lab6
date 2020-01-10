@@ -7,6 +7,11 @@ Rectangle::Rectangle(Point2D pos, Color color, int width, int height)
 
 void Rectangle::render(SDL_Renderer* renderer)
 {
+    //
+    // renders a rectangle around the position
+    // the position is the midpoint of the rectangle
+    // not the top left corner
+    //
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 
     int hw = width/2;
