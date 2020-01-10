@@ -12,7 +12,7 @@ Asteroid::Asteroid( Point2D pos, glm::vec3 rotation_axis, float speed)
     :GameObject(pos, new ModelShape(Point2D(0,0), ASTEROID_COLOR,&GeneratedModels::asteroid_1_model), ASTEROID_SIZE), rotation_axis(rotation_axis), speed(speed)
 {
     rotation = 0.0f;
-    health = 4;
+    health = ASTEROID_HEALTH;
     color = ASTEROID_COLOR;
 }
 

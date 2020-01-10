@@ -1,0 +1,8 @@
+Move sideways with left and right arrow keys and Shoot with the up arrow key.
+Try to destroy as many asteroids as you can while not getting hit by them
+your score is displayed in the console after you die.
+
+(it's recomended to run without the debugger and on our vitrual machines the
+it's a bit slow sometimes but on local harware it's fine)
+
+My highscore is 645 if you want to beat it.

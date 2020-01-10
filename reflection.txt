@@ -1,0 +1,9 @@
+I think a little more guidence on how to structure our game in an OO way could be benefitial to alot of my classmates
+Also a more extensive guide on git (maybe some git only excercise and spend an entire lecture on it together with linking) would help a lot
+
+Because I already have experience of c++, OOP and some 3D graphics I thought I would do something more advanced and tried a bit of and 
+game engine esque structure. I thought a lot about how to organize the Shapes and Gameobjects. One thing I tried was that the GameObjects only having a pointer
+to the shapes but not owning them with the shapes stored shape vector. But I found for this small of a game it's easeier for the GameObject to just own a shape
+and then just have its own rendering function that invokes shapres rendering function. Another thing I thought about was if I should send the Game object as and parameter
+to the GameObjects update function, but then I faced some circular include issues so I settled on having a static 'global' reference to the Game object 
+that the GameObjects could accsess and reduced the amount of public members of the Game Class.

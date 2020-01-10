@@ -14,6 +14,7 @@ const int   ASTEROID_SPAWN_TIMER_START = 120;
 const float ASTEROID_SIZE = 0.9f;
 const float ASTEROID_START_SPEED = 0.2f;
 const int   ASTEROID_KILL_SCORE = 5;
+const int	ASTEROID_HEALTH = 4;
 const int   ASTEROID_COLOR = 0xFFFFFFFF;
 const float ASTEROID_FADE_IN_AT = -140.0f;
 const float ASTEROID_FADE_OUT_AT = 0.0f;
