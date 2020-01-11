@@ -34,6 +34,7 @@ add_executable(game
     src/Shape3D.cpp
     src/ModelShape.cpp
     src/ParticleShape.cpp
+    src/NumberShape.cpp
     src/GameObject.cpp
     src/SpaceShip.cpp
     src/Asteroid.cpp

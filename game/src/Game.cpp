@@ -77,6 +77,10 @@ Game::Game(int window_width, int window_height)
         // initialize lives counter 
         for(int i = 0; i < MAX_LIVES; i++)
             lives_counter_ui.push_back(new FilledRectangle(Point2D(15+30*i, 15),0xAA0000FF, 20,20));
+
+        // initialize Score numbers
+        for(int i = 0; i < 5; i++)
+            score_numbers.push_back(new NumberShape(Point2D(window_width - 20 - i*20, 10),0xFFFFFFFF, 0, 10.0f));
     }
 }
 
@@ -94,6 +98,8 @@ Game::~Game()
         delete particle;
 
     for(auto shape: lives_counter_ui)
+        delete shape;
+    for(auto shape: score_numbers)
         delete shape;
 
     // quit SDL
@@ -242,14 +248,15 @@ void Game::render_ui()
     // Render the ui
     // Currently the only ui element is the life counter in the top left corner
     //
-    int i = 1;
     if( space_ship->get_lives() < lives_counter_ui.size() && lives_counter_ui.size() >= 0 )
         lives_counter_ui.pop_back();
     for(auto s: lives_counter_ui)
     {
         s->render(renderer);    
-        i++;
     }
+
+    for(auto s: score_numbers)
+        s->render(renderer);
 }
 
 void Game::spawn_asteroid()
@@ -297,6 +304,13 @@ void Game::spawn_particles(Point2D pos, glm::vec3 rotation_axis, float rotation)
 void Game::increase_score(int increase)
 {
     score += increase;
+
+    int sc = score;
+    for(auto s: score_numbers )
+    {
+        s->set_number(sc%10);
+        sc = sc/10;
+    }
 }
 
 const std::vector<Asteroid*>* Game::get_asteroids()
