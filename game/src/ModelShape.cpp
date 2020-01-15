@@ -2,6 +2,9 @@
 
 #include "Game.h"
 
+
+SDL_Point temp_workspace[100];
+
 ModelShape::ModelShape(Point2D pos, Color color, const Model* model)
     :Shape3D(pos, color), model(model)
 {
@@ -13,7 +16,7 @@ void ModelShape::render(SDL_Renderer* renderer)
     // get projection-view matrix and combine it with the model matrix
     glm::mat4 entire_trans_mat = *Game::get_game()->get_pv_mat() * model_mat;
 
-    SDL_Point* points = new SDL_Point[model->n_points];
+    //SDL_Point* points = new SDL_Point[model->n_points];
 
     // apply the entire transformation matrix to each 
     // point to get the point's screen-coordinates
@@ -21,7 +24,7 @@ void ModelShape::render(SDL_Renderer* renderer)
     {
         glm::vec4 pos = entire_trans_mat * glm::vec4( model->points[i], 1.0f );
         pos /= pos.w;
-        points[i] = {(int)pos.x,(int)pos.y};
+        temp_workspace[i] = {(int)pos.x,(int)pos.y};
     }
 
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
@@ -29,8 +32,8 @@ void ModelShape::render(SDL_Renderer* renderer)
     // draw lines between the points
     for(int i = 0; i < model->n_lines; i++)
     {
-        SDL_Point& p1 = points[model->lines[i].a];
-        SDL_Point& p2 = points[model->lines[i].b];
+        SDL_Point& p1 = temp_workspace[model->lines[i].a];
+        SDL_Point& p2 = temp_workspace[model->lines[i].b];
         SDL_RenderDrawLine( renderer,
                             p1.x + (int)position.get_x(),
                             p1.y + (int)position.get_y(),
@@ -39,5 +42,5 @@ void ModelShape::render(SDL_Renderer* renderer)
         );
     }
 
-    delete[] points;
+    //delete[] points;
 }

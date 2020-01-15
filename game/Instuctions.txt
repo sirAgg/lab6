@@ -6,3 +6,6 @@ your score is displayed in the console after you die.
 it's a bit slow sometimes but on local harware it's fine)
 
 My highscore is 645 if you want to beat it.
+
+Github:
+https://github.com/sirAgg/lab6.git
