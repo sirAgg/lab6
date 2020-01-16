@@ -1,16 +1,16 @@
 #ifndef __SEVENSEGSHAPE_H_
-#define __NUMBERSHAPE_H_
+#define __SEVENSEGSHAPE_H_
 
 #include "Shape.h"
 
-class NumberShape : public Shape
+class SevenSegShape : public Shape
 {
 public:
-    NumberShape(Point2D pos, Color color, unsigned char lines, float scale);
-    NumberShape(Point2D pos, Color color, int number, float scale);
+    SevenSegShape(Point2D pos, Color color, unsigned char lines, float scale);
+    SevenSegShape(Point2D pos, Color color, int number, float scale);
     void render(SDL_Renderer *renderer) override;
     void set_number(int n);
-    int get_number();
+    void set_lines(unsigned char l);
 
     void set_scale(float s);
 private:
@@ -18,4 +18,4 @@ private:
     float scale;
 };
 
-#endif // __NUMBERSHAPE_H_
+#endif // __SEVENSEGSHAPE_H_

@@ -80,7 +80,7 @@ Game::Game(int window_width, int window_height)
 
         // initialize Score numbers
         for(int i = 0; i < 5; i++)
-            score_numbers.push_back(new NumberShape(Point2D(window_width - 20 - i*20, 10),0xFFFFFFFF, 0, 10.0f));
+            score_numbers.push_back(new SevenSegShape(Point2D(window_width - 20 - i*20, 10),0xFFFFFFFF, 0, 0.4f));
     }
 }
 

@@ -7,7 +7,7 @@
 #include "glm/glm.hpp"
 
 #include "Shape.h"
-#include "NumberShape.h"
+#include "SevenSegShape.h"
 #include "SpaceShip.h"
 #include "Asteroid.h"
 #include "LazerShot.h"
@@ -77,7 +77,7 @@ private:
 
     // shapes for displaying lifes
     std::vector<Shape*> lives_counter_ui;
-    std::vector<NumberShape*> score_numbers;
+    std::vector<SevenSegShape*> score_numbers;
 };
 
 #endif // __GAME_H_
